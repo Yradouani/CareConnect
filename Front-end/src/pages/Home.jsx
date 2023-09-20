@@ -14,7 +14,7 @@ const Home = () => {
             <div className='primary-part'>
                 <div className='logo-container'>
                     <img src="logo.png" alt="logo" className='logo' />
-                    <p>La première application de rappel de vaccin automatisé</p>
+                    <p>Plateforme de réservation médicale en ligne, où la santé rencontre la simplicité</p>
                 </div>
                 <img className='primary-part__img' src="imc.png" alt="vétérianire" />
                 <p className='copyright'>Copyright <AiOutlineCopyrightCircle /> 2023, CareConnect. All rights reserved</p>
