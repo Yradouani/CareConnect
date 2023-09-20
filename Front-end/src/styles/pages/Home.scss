@@ -3,10 +3,7 @@ html {
 }
 
 .home {
-    // background: url('../../../public/bg.png');
     display: flex;
-    // align-items: center;
-    // justify-content: center;
     height: 100%;
 
     .primary-part {
@@ -29,6 +26,10 @@ html {
                 color: $color-3;
                 margin: 0;
             }
+        }
+
+        &__img {
+            width: 140%;
         }
 
         .copyright {

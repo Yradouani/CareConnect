@@ -6,12 +6,12 @@ use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
     public function registration(Request $request)
     {
-
         $userInfo = $request->validate([
             "firstname" => ["required", "string", "min:2", "max:30"],
             "lastname" => ["required", "string", "min:2", "max:30"],
@@ -30,7 +30,6 @@ class UserController extends Controller
             "password" => bcrypt($userInfo["password"]),
         ]);
 
-        $userId = $user->id;
         if ($userInfo["role"] === "doctor") {
             $doctorInfo = $request->validate([
                 "specialization" => ["required", "string"],
@@ -48,6 +47,7 @@ class UserController extends Controller
             ]);
         } else if ($userInfo["role"] === "patient") {
             $patientInfo = $request->validate([
+                // "YYYY-MM-DD"
                 "dateOfBirth" => ["required", 'date'],
                 "SocialSecurityNumber" => ["required", "string", "size:15"]
             ]);
@@ -58,6 +58,23 @@ class UserController extends Controller
                 "SocialSecurityNumber" => $patientInfo["SocialSecurityNumber"],
             ]);
         }
-        return response($doctor, 201);
+        return response($patient, 201);
+    }
+
+    public function logIn(Request $request)
+    {
+        $userInfo = $request->validate([
+            "email" => ["required", "email"],
+            "password" => ["required", "string", "min:8", "max:30"],
+        ]);
+
+        $user = User::where("email", $userInfo["email"])->first();
+        if (!$user) return response(["message" => "Aucun utilisateur de trouver avec l'email suivant $userInfo[email]"], 401);
+        if (!Hash::check($userInfo["password"], $user->password)) return response(["message" => "Aucun utilisateur de trouver avec ce mot de passe"], 401);
+        $token = $user->createToken('SECRET_KEY')->plainTextToken;
+        return response([
+            "user" => $user,
+            "token" => $token
+        ], 200);
     }
 }

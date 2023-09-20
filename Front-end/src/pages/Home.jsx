@@ -16,8 +16,8 @@ const Home = () => {
                     <img src="logo.png" alt="logo" className='logo' />
                     <p>La première application de rappel de vaccin automatisé</p>
                 </div>
-                <img src="imc.png" alt="vétérianire" />
-                <p className='copyright'>Copyright <AiOutlineCopyrightCircle /> 2022, Véto'app. All rights reserved</p>
+                <img className='primary-part__img' src="imc.png" alt="vétérianire" />
+                <p className='copyright'>Copyright <AiOutlineCopyrightCircle /> 2023, CareConnect. All rights reserved</p>
             </div>
             <div className='second-part'>
                 <div className='connect_modal'>
