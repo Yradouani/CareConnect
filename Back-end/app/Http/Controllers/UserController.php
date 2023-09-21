@@ -18,7 +18,8 @@ class UserController extends Controller
             "phone" => ["required", "string", "min:10", "max:13"],
             "role" => ["required", "string", "in:patient,doctor"],
             "email" => ["required", "email", "unique:users,email"],
-            "password" => ["required", "string", "min:8", "max:30", "confirmed"],
+            "password" => ["required", "string", "min:8", "max:30"],
+            "confirm_password" => ["required", "same:password"]
         ]);
 
         $user = User::create([
@@ -36,6 +37,7 @@ class UserController extends Controller
                 "officeAddress" => ["required", "string"],
                 "officePostalCode" => ["required", "string", "size:5"],
                 "officeCity" => ["required", "string", "min:2", "max:30"],
+                "RPPSNumber" => ["required", "string", "size:11"],
             ]);
 
             $doctor = Doctor::create([
@@ -44,18 +46,19 @@ class UserController extends Controller
                 "officeAddress" => $doctorInfo["officeAddress"],
                 "officePostalCode" => $doctorInfo["officePostalCode"],
                 "officeCity" => $doctorInfo["officeCity"],
+                "RPPSNumber" => $doctorInfo["RPPSNumber"],
             ]);
         } else if ($userInfo["role"] === "patient") {
             $patientInfo = $request->validate([
                 // "YYYY-MM-DD"
                 "dateOfBirth" => ["required", 'date'],
-                "SocialSecurityNumber" => ["required", "string", "size:15"]
+                "socialSecurityNumber" => ["required", "string", "size:15"]
             ]);
 
             $patient = Patient::create([
                 "user_id" => $user->id,
                 "dateOfBirth" => $patientInfo["dateOfBirth"],
-                "SocialSecurityNumber" => $patientInfo["SocialSecurityNumber"],
+                "socialSecurityNumber" => $patientInfo["socialSecurityNumber"],
             ]);
         }
         return response($patient, 201);

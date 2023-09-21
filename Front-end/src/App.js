@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import MainPage from './pages/MainPage';
+import MainPage from './pages/Home';
 import Customers from './pages/Customers';
 import Animals from './pages/Animals';
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import CustomersProfile from './pages/CustomersProfile';
 import AnimalProfil from './pages/AnimalProfil';
 import Appointments from './pages/Appointments';
 import Connection from './pages/Connection';
+import Home from './pages/Home';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -16,7 +17,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/' exact element={<Connection />} />
-          <Route path='/page_accueil' exact element={<MainPage />} />
+          <Route path='/accueil' exact element={<Home />} />
           <Route path='/clients' exact element={<Customers />} />
           <Route path='/profil_client/id=:id' exact element={<CustomersProfile />} />
           <Route path='/profil_animal/id=:id' exact element={<AnimalProfil />} />

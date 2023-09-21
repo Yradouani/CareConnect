@@ -18,7 +18,7 @@ class CreatePatientsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->date('dateOfBirth');
-            $table->string('SocialSecurityNumber', 15);
+            $table->string('socialSecurityNumber', 15);
             $table->timestamps();
         });
     }

@@ -6,7 +6,7 @@ import axios from '../api/axios';
 import { useState } from 'react';
 import Loader from '../components/Loader';
 
-const MainPage = () => {
+const Home = () => {
     // const { auth } = useContext(AuthContext);
     const [data, setData] = useState({});
     const [modal, setModal] = useState(false);
@@ -316,4 +316,4 @@ const MainPage = () => {
     );
 };
 
-export default MainPage;
+export default Home;

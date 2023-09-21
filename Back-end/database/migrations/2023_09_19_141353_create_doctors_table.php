@@ -21,6 +21,7 @@ class CreateDoctorsTable extends Migration
             $table->string('officeAddress');
             $table->string('officePostalCode', 5);
             $table->string('officeCity', 30);
+            $table->string('RPPSNumber', 11);
             $table->timestamps();
         });
     }

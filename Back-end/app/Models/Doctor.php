@@ -15,6 +15,7 @@ class Doctor extends Model
         'officeAddress',
         'officePostalCode',
         'officeCity',
+        'RPPSNumber'
     ];
 
     public function user()

@@ -16,7 +16,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     //Connection constant
-    const LOGIN_URL = '/user/login';
+    const LOGIN_URL = '/connexion';
 
     //Focus sur le premier élément au chargement de la page
     useEffect(() => {
@@ -35,7 +35,7 @@ const Login = () => {
         try {
             const response = await axios.post(
                 LOGIN_URL,
-                JSON.stringify({ email, pwd }),
+                JSON.stringify({ email, password: pwd }),
                 {
                     headers: { 'Content-Type': 'application/json' },
                     // withCredentials: true
@@ -44,15 +44,10 @@ const Login = () => {
             console.log(JSON.stringify(response?.data));
             const accessToken = response?.data?.token;
             const userId = response?.data?.user.id;
-            const isClient = response?.data?.user.isClient;
-            console.log(isClient);
+            const role = response?.data?.user.role;
+            console.log(role);
             let type;
 
-            if (isClient) {
-                type = 'client';
-            } else {
-                type = 'veterinary';
-            }
             // const firstname = response?.data?.user.firstname;
             console.log(accessToken, type);
 
@@ -63,9 +58,9 @@ const Login = () => {
             // console.log(auth.userId);
             console.log(type);
             localStorage.setItem('userId', userId);
-            localStorage.setItem('type', type);
+            localStorage.setItem('role', role);
             localStorage.setItem('accessToken', accessToken);
-            navigate('/page_accueil');
+            navigate('/accueil');
 
         } catch (err) {
             console.log(err);

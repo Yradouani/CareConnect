@@ -12,7 +12,7 @@ class Patient extends Model
     protected $fillable = [
         'user_id',
         'dateOfBirth',
-        'SocialSecurityNumber'
+        'socialSecurityNumber'
     ];
 
     public function user()

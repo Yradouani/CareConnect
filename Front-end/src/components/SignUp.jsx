@@ -10,6 +10,7 @@ import Login from './Login';
 const SignUp = (props) => {
     const registerFirstname = useRef();
     const registerLastname = useRef();
+    const registerPhone = useRef();
     const registerEmail = useRef();
     const registerPassword = useRef();
     const registerConfirmPassword = useRef();
@@ -27,6 +28,7 @@ const SignUp = (props) => {
 
     //REGEX
     const USER_REGEX = /^[a-zA-Z][a-zA-Z-éÉèÈàÀùÙâÂêÊîÎôÔûÛïÏëËüÜçÇ]{2,24}$/;
+    const PHONE_REGEX = /^\d{10,13}$/;
     const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%£§&]).{8,24}$/;
     const SOCIAL_SECURITY_REGEX = /^[0-9]{15}$/;
     const ADDRESS_REGEX = /^\d+\s+[\w\s-]+$/;
@@ -36,7 +38,7 @@ const SignUp = (props) => {
     const DATE_OF_BIRTH_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
     //Register constants
-    const SIGNIN_URL = '/user/signin';
+    const SIGNIN_URL = '/inscription';
 
     const [socialSecurityNumber, setSocialSecurityNumber] = useState('');
     const [validSocialSecurityNumber, setValidSocialSecurityNumber] = useState(false);
@@ -49,6 +51,10 @@ const SignUp = (props) => {
     const [lastName, setLastName] = useState('');
     const [validLastName, setValidLastName] = useState(false);
     const [lastNameFocus, setLastNameFocus] = useState(false);
+
+    const [phone, setPhone] = useState('');
+    const [validPhone, setValidPhone] = useState(false);
+    const [phoneFocus, setPhoneFocus] = useState(false);
 
     const [email, setEmail] = useState('');
     const [validEmail, setValidEmail] = useState(false);
@@ -64,7 +70,6 @@ const SignUp = (props) => {
 
     const [role, setRole] = useState('');
     const [validRole, setValidRole] = useState(false);
-    const [roleFocus, setRoleFocus] = useState(false);
 
     const [dateOfBirth, setDateOfBirth] = useState('');
     const [validDateOfBirth, setValidDateOfBirth] = useState(false);
@@ -95,7 +100,7 @@ const SignUp = (props) => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    //Focus sur le premier élément au chargement de la page
+    //Focus on first element when page is loaded
     useEffect(() => {
         registerFirstname.current.focus();
     }, [])
@@ -119,6 +124,12 @@ const SignUp = (props) => {
     }, [lastName])
 
     useEffect(() => {
+        const result = PHONE_REGEX.test(phone);
+        setValidPhone(result);
+        //eslint-disable-next-line
+    }, [phone])
+
+    useEffect(() => {
         const result = EMAIL_REGEX.test(email);
         setValidEmail(result);
         //eslint-disable-next-line
@@ -138,8 +149,9 @@ const SignUp = (props) => {
     }, [pwd, matchPwd])
 
     useEffect(() => {
-        const result = DATE_OF_BIRTH_REGEX.test(dateOfBirth);
-        setValidDateOfBirth(result);
+        const isDateOfBirthValid = DATE_OF_BIRTH_REGEX.test(dateOfBirth);
+        const isOver18YearsOld = calculateAge(dateOfBirth) >= 18;
+        setValidDateOfBirth(isDateOfBirthValid && isOver18YearsOld);
         //eslint-disable-next-line
     }, [dateOfBirth])
 
@@ -175,17 +187,50 @@ const SignUp = (props) => {
 
     useEffect(() => {
         setErrMsg('');
-    }, [firstName, lastName, email, pwd, matchPwd, dateOfBirth, role])
+    }, [firstName, lastName, email, pwd, matchPwd, role])
 
+
+    function calculateAge(dateOfBirth) {
+        const birthDate = new Date(dateOfBirth);
+        const currentDate = new Date();
+        const age = currentDate.getFullYear() - birthDate.getFullYear();
+
+        if (
+            currentDate.getMonth() < birthDate.getMonth() ||
+            (currentDate.getMonth() === birthDate.getMonth() && currentDate.getDate() < birthDate.getDate())
+        ) {
+            return age - 1;
+        }
+        return age;
+    }
 
     const handleRegister = async (e) => {
         e.preventDefault();
 
-        if (validSocialSecurityNumber && validFirstName && validLastName && validEmail && validPwd && validMatch && validRole) {
+        if (
+            validSocialSecurityNumber
+            && validFirstName
+            && validLastName
+            && validEmail
+            && validPwd
+            && validMatch
+            && validRole
+            && (role !== "doctor" || (validSpecialization && validOfficeAddress && validOfficePostalCode && validOfficeCity && validRPPSNumber))
+            && (role !== "patient" || (validDateOfBirth && validSocialSecurityNumber))) {
             try {
                 const response = await axios.post(
                     SIGNIN_URL,
-                    JSON.stringify({ socialSecurityNumber, firstname: firstName, lastname: lastName, email, pwd, matchPwd }),
+                    JSON.stringify({
+                        firstname: firstName,
+                        lastname: lastName,
+                        phone,
+                        role,
+                        email,
+                        password: pwd,
+                        confirm_password: matchPwd,
+                        ...(role === "patient" ? { dateOfBirth, socialSecurityNumber } : {}),
+                        ...(role === "doctor" ? { specialization, officeAddress, officePostalCode, officeCity, RPPSNumber } : {})
+                    }),
                     {
                         headers: { 'Content-Type': 'application/json' },
                         // withCredentials: true
@@ -288,6 +333,39 @@ const SignUp = (props) => {
                                     <td colspan="2" id="lastnamenote" className={lastNameFocus && lastName && !validLastName ? "instructions" : "offscreen"}>
                                         <CgDanger className='danger' />
                                         Entre 3 et 23 lettres
+                                    </td>
+                                </tr>
+
+                                {/* Phone */}
+                                <tr>
+                                    <td>
+                                        <label htmlFor="phone">Numéro de téléphone * :
+                                            <span className={validPhone ? "valid" : "hide"}>
+                                                <BsCheckLg />
+                                            </span>
+                                            <span className={validPhone || !phone ? "hide" : "invalid"}>
+                                                <ImCross />
+                                            </span>
+                                        </label>
+                                    </td>
+                                    <td><input
+                                        type="text"
+                                        name="phone"
+                                        id="phone"
+                                        required
+                                        ref={registerPhone}
+                                        autoComplete='off'
+                                        aria-invalid={validPhone ? "false" : "true"}
+                                        aria-describedby="lastnamenote"
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        onFocus={() => setPhoneFocus(true)}
+                                        onBlur={() => setPhoneFocus(false)}
+                                    /></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" id="phone" className={phoneFocus && phone && !validPhone ? "instructions" : "offscreen"}>
+                                        <CgDanger className='danger' />
+                                        Veuillez saisir un numéro de téléphone valide
                                     </td>
                                 </tr>
 
@@ -523,7 +601,7 @@ const SignUp = (props) => {
                                         <tr>
                                             <td colspan="2" id="dateofbirthnote" className={dateOfBirthFocus && dateOfBirth && !validDateOfBirth ? "instructions" : "offscreen"}>
                                                 <CgDanger className='danger' />
-                                                Veuillez saisir une date de naissance valide
+                                                Vous devez avoir au moins 18 ans pour vous inscrire
                                             </td>
                                         </tr>
                                     </tbody>
@@ -535,14 +613,14 @@ const SignUp = (props) => {
                         {role === "doctor" ? (
                             <table>
                                 <tbody>
-                                    {/* SocialSecurityNumber */}
+                                    {/* Specialization */}
                                     <tr>
                                         <td>
-                                            <label htmlFor="socialSecurityNumber">Domaine d'exercice * :
-                                                <span className={validSocialSecurityNumber ? "valid" : "hide"}>
+                                            <label htmlFor="specialization">Domaine d'exercice * :
+                                                <span className={validSpecialization ? "valid" : "hide"}>
                                                     <BsCheckLg />
                                                 </span>
-                                                <span className={validSocialSecurityNumber || !socialSecurityNumber ? "hide" : "invalid"}>
+                                                <span className={validSpecialization || !specialization ? "hide" : "invalid"}>
                                                     <ImCross />
                                                 </span>
                                             </label>
@@ -574,37 +652,139 @@ const SignUp = (props) => {
                                         </td>
                                     </tr>
 
-                                    {/* DateOfBirth */}
+                                    {/* OfficeAddress */}
                                     <tr>
                                         <td>
-                                            <label htmlFor="dateOfBirth">Date de naissance * :
-                                                <span className={validDateOfBirth ? "valid" : "hide"}>
+                                            <label htmlFor="officeAddress">Adresse du cabinet * :
+                                                <span className={validOfficeAddress ? "valid" : "hide"}>
                                                     <BsCheckLg />
                                                 </span>
-                                                <span className={validDateOfBirth || !dateOfBirth ? "hide" : "invalid"}>
+                                                <span className={validOfficeAddress || !officeAddress ? "hide" : "invalid"}>
                                                     <ImCross />
                                                 </span>
                                             </label>
                                         </td>
 
                                         <td><input
-                                            type="date"
-                                            name="dateOfBirth"
-                                            id="dateOfBirth"
+                                            type="text"
+                                            name="officeAddress"
+                                            id="officeAddress"
                                             required
-                                            ref={registerDateOfBirth}
+                                            ref={registerOfficeAddress}
                                             autoComplete='off'
-                                            aria-invalid={validDateOfBirth ? "false" : "true"}
-                                            aria-describedby="dateofbirthnote"
-                                            onChange={(e) => setDateOfBirth(e.target.value)}
-                                            onFocus={() => setDateOfBirthFocus(true)}
-                                            onBlur={() => setDateOfBirthFocus(false)}
+                                            aria-invalid={validOfficeAddress ? "false" : "true"}
+                                            aria-describedby="officeaddressnote"
+                                            onChange={(e) => setOfficeAddress(e.target.value)}
+                                            onFocus={() => setOfficeAddressFocus(true)}
+                                            onBlur={() => setOfficeAddressFocus(false)}
                                         /></td>
                                     </tr>
                                     <tr>
-                                        <td colspan="2" id="dateofbirthnote" className={dateOfBirthFocus && dateOfBirth && !validDateOfBirth ? "instructions" : "offscreen"}>
+                                        <td colspan="2" id="officeaddressnote" className={officeAddressFocus && officeAddress && !validOfficeAddress ? "instructions" : "offscreen"}>
                                             <CgDanger className='danger' />
-                                            Veuillez saisir une date de naissance valide
+                                            Veuillez saisir une adresse valide
+                                        </td>
+                                    </tr>
+
+                                    {/* OfficePostalCode */}
+                                    <tr>
+                                        <td>
+                                            <label htmlFor="officePostalCode">Code postal du cabinet * :
+                                                <span className={validOfficePostalCode ? "valid" : "hide"}>
+                                                    <BsCheckLg />
+                                                </span>
+                                                <span className={validOfficePostalCode || !officePostalCode ? "hide" : "invalid"}>
+                                                    <ImCross />
+                                                </span>
+                                            </label>
+                                        </td>
+
+                                        <td><input
+                                            type="text"
+                                            name="officePostalCode"
+                                            id="officePostalCode"
+                                            required
+                                            ref={registerOfficePostalCode}
+                                            autoComplete='off'
+                                            aria-invalid={validOfficePostalCode ? "false" : "true"}
+                                            aria-describedby="officepostalcodenote"
+                                            onChange={(e) => setOfficePostalCode(e.target.value)}
+                                            onFocus={() => setOfficePostalCodeFocus(true)}
+                                            onBlur={() => setOfficePostalCodeFocus(false)}
+                                        /></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" id="officepostalcodenote" className={officePostalCodeFocus && officePostalCode && !validOfficePostalCode ? "instructions" : "offscreen"}>
+                                            <CgDanger className='danger' />
+                                            Veuillez saisir un code postal valide
+                                        </td>
+                                    </tr>
+
+                                    {/* OfficeCity */}
+                                    <tr>
+                                        <td>
+                                            <label htmlFor="officeCity">Ville du cabinet * :
+                                                <span className={validOfficeCity ? "valid" : "hide"}>
+                                                    <BsCheckLg />
+                                                </span>
+                                                <span className={validOfficeCity || !officeCity ? "hide" : "invalid"}>
+                                                    <ImCross />
+                                                </span>
+                                            </label>
+                                        </td>
+
+                                        <td><input
+                                            type="text"
+                                            name="officeCity"
+                                            id="officeCity"
+                                            required
+                                            ref={registerOfficeCity}
+                                            autoComplete='off'
+                                            aria-invalid={validOfficeCity ? "false" : "true"}
+                                            aria-describedby="officecitynote"
+                                            onChange={(e) => setOfficeCity(e.target.value)}
+                                            onFocus={() => setOfficeCityFocus(true)}
+                                            onBlur={() => setOfficeCityFocus(false)}
+                                        /></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" id="officecitynote" className={officeCityFocus && officeCity && !validOfficeCity ? "instructions" : "offscreen"}>
+                                            <CgDanger className='danger' />
+                                            Veuillez saisir une ville valide
+                                        </td>
+                                    </tr>
+
+                                    {/* RPPSNumber */}
+                                    <tr>
+                                        <td>
+                                            <label htmlFor="officeCity">Numéro RPPS * :
+                                                <span className={validRPPSNumber ? "valid" : "hide"}>
+                                                    <BsCheckLg />
+                                                </span>
+                                                <span className={validRPPSNumber || !RPPSNumber ? "hide" : "invalid"}>
+                                                    <ImCross />
+                                                </span>
+                                            </label>
+                                        </td>
+
+                                        <td><input
+                                            type="text"
+                                            name="RPPSNumber"
+                                            id="RPPSNumber"
+                                            required
+                                            ref={registerRPPSNumber}
+                                            autoComplete='off'
+                                            aria-invalid={validRPPSNumber ? "false" : "true"}
+                                            aria-describedby="rppsnumbernote"
+                                            onChange={(e) => setRPPSNumber(e.target.value)}
+                                            onFocus={() => setRPPSNumberFocus(true)}
+                                            onBlur={() => setRPPSNumberFocus(false)}
+                                        /></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" id="rppsnumbernote" className={RPPSNumberFocus && RPPSNumber && !validRPPSNumber ? "instructions" : "offscreen"}>
+                                            <CgDanger className='danger' />
+                                            Veuillez saisir un numéro RPPS valide
                                         </td>
                                     </tr>
                                 </tbody>
