@@ -4,7 +4,7 @@ import Login from '../components/Login';
 import SignUp from '../components/SignUp';
 import { AiOutlineCopyrightCircle } from "react-icons/ai";
 
-const Home = () => {
+const Connection = () => {
     const [signUp, setSignUp] = useState(true);
     const [success, setSuccess] = useState(false);
 
@@ -51,4 +51,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default Connection;

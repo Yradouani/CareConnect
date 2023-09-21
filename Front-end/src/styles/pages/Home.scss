@@ -138,7 +138,9 @@ html {
     }
 
     table {
-        input {
+
+        input,
+        select {
             border: none;
             background: $color-2;
             height: 18px;
@@ -219,7 +221,9 @@ html {
     }
 
     td {
-        input {
+
+        input,
+        select {
             @media (max-width: 586px) {
                 width: 90%;
             }
@@ -258,7 +262,8 @@ html {
         margin: 20px;
         padding: 20px;
 
-        input {
+        input,
+        select {
             border: 2px solid $color-2;
             padding: 8px 25px;
             font-size: 16px;
