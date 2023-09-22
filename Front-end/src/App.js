@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import MainPage from './pages/Home';
 import Customers from './pages/Customers';
 import Animals from './pages/Animals';
 import { useState } from 'react';

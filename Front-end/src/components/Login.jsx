@@ -1,11 +1,11 @@
 import React from 'react';
-import { useRef, useState, useEffect, useContext } from 'react';
-import AuthContext from "../context/AuthProvider";
+import { useRef, useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../actions/user.action';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom'
 
 const Login = () => {
-    // const { auth, setAuth } = useContext(AuthContext);
     const emailRef = useRef();
     const errRef = useRef();
 
@@ -14,6 +14,7 @@ const Login = () => {
     const [errMsg, setErrMsg] = useState('');
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     //Connection constant
     const LOGIN_URL = '/connexion';
@@ -41,27 +42,17 @@ const Login = () => {
                     // withCredentials: true
                 }
             );
-            console.log(JSON.stringify(response?.data));
-            const accessToken = response?.data?.token;
-            const userId = response?.data?.user.id;
-            const role = response?.data?.user.role;
-            console.log(role);
-            let type;
-
-            // const firstname = response?.data?.user.firstname;
-            console.log(accessToken, type);
-
-            // const redirection = await setAuth({ email, accessToken, isClient, userId, firstname });
-            // console.log(redirection);
-
-            // console.log(auth.isClient);
-            // console.log(auth.userId);
-            console.log(type);
-            localStorage.setItem('userId', userId);
-            localStorage.setItem('role', role);
-            localStorage.setItem('accessToken', accessToken);
+            const userData = {
+                id: response?.data?.user.id,
+                token: response?.data?.token,
+                firstname: response?.data?.user.firstname,
+                lastname: response?.data?.user.lastname,
+                phone: response?.data?.user.phone,
+                email: response?.data?.user.email,
+                role: response?.data?.user.role,
+            };
+            dispatch(setUser(userData));
             navigate('/accueil');
-
         } catch (err) {
             console.log(err);
             if (!err?.response) {
@@ -75,7 +66,6 @@ const Login = () => {
             }
             errRef.current.focus();
         }
-
     }
 
     return (
