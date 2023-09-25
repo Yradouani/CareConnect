@@ -1,5 +1,82 @@
-.header{
-    &__background{
+.header {
+    &__background {
         width: 100%;
+        position: absolute;
+    }
+
+    h1 {
+        position: relative;
+        color: #FFFFFF;
+        text-align: center;
+        padding-top: 50px;
+    }
+
+    &__searchbar {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        padding-top: 30px;
+
+        form {
+            display: flex;
+            background: #FFFFFF;
+            border-radius: 10px;
+            justify-content: space-between;
+        }
+
+        &-input {
+            &-wrapper {
+                background: #FFFFFF;
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                width: 200px;
+
+                input {
+                    border: none;
+                    outline: none;
+                    font-size: 15px;
+                }
+
+                &:first-child {
+                    border-right: 1px solid #75b6fe;
+                }
+            }
+
+            &-icon {
+                margin-right: 5px;
+                fill: #2b4660;
+            }
+        }
+
+        &-submit {
+            &-wrapper {
+                padding: 3px;
+                cursor: pointer;
+
+                input {
+                    border: none;
+                    background: #FEBD75;
+                    color: #FFFFFF;
+                    font-size: 15px;
+                    font-weight: bold;
+                    cursor: pointer;
+                }
+            }
+
+            &-background {
+                background: #FEBD75;
+                padding: 16px;
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+                display: flex;
+                align-items: center;
+            }
+
+            &-icon {
+                fill: #FFFFFF;
+                margin-left: 5px;
+            }
+        }
     }
 }

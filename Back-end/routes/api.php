@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/inscription', [UserController::class, "registration"]);
 Route::post('/connexion', [UserController::class, "logIn"]);
+Route::post('/mon-compte', [UserController::class, "getUserById"]);
+Route::post('/recherche', [UserController::class, "getDoctorByNameSpecialityAndLocation"]);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });

@@ -24,7 +24,7 @@ const SignUp = (props) => {
     const registerRPPSNumber = useRef();
     const errRef = useRef();
 
-    const specializationList = ["Médecine générale", "Cardiologie", "Dermatologie", "Gastro-entérologie", "Pédiatrie", "Orthopédie", "Ophtalmologie", "Dentaire", "Gynécologie", "Ostéopathie", "Endocrinologie", "Pneumologie"];
+    const specializationList = ["Médecin généraliste", "Cardiologue", "Dermatologue", "Gastro-entérologue", "Pédiatre", "Psychiatre", "Orthopédiste", "Chirurgien", "Ophtalmologiste", "Dentiste", "Gynécologue", "Ostéopathe", "Endocrinologue", "Pneumologue"];
 
     //REGEX
     const USER_REGEX = /^[a-zA-Z][a-zA-Z-éÉèÈàÀùÙâÂêÊîÎôÔûÛïÏëËüÜçÇ]{2,24}$/;

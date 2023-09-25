@@ -16,14 +16,9 @@ const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    //Connection constant
-    const LOGIN_URL = '/connexion';
-
-    //Focus sur le premier élément au chargement de la page
     useEffect(() => {
         emailRef.current.focus();
     }, [])
-
 
     //Enlever le msg d'erreur si l'utilisateur entre des données
     useEffect(() => {
@@ -35,7 +30,7 @@ const Login = () => {
 
         try {
             const response = await axios.post(
-                LOGIN_URL,
+                '/connexion',
                 JSON.stringify({ email, password: pwd }),
                 {
                     headers: { 'Content-Type': 'application/json' },

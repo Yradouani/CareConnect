@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -79,5 +81,63 @@ class UserController extends Controller
             "user" => $user,
             "token" => $token
         ], 200);
+    }
+
+    public function getUserById(User $id)
+    {
+        try {
+            $user = User::find($id);
+            if ($user->role == "doctor") {
+                $doctor = DB::table("doctors")
+                    ->join("users", "doctors.user_id", "=", "users.id")
+                    ->select("doctors.*")
+                    ->where("doctors.user_id", "=", $id)
+                    ->get();
+
+                $user += $doctor;
+            } else if ($user->role == "patient") {
+                $patient = DB::table("patients")
+                    ->join("users", "patients.user_id", "=", "users.id")
+                    ->select("patients.*")
+                    ->where("patients.user_id", "=", $id)
+                    ->get();
+
+                $user += $patient;
+            }
+        } catch (Exception $e) {
+            echo '</br> <b> Exception Message: ' . $e->getMessage() . '</b>';
+        }
+        return $user;
+    }
+
+    public function updateInfoUser(Request $request, $id)
+    {
+    }
+
+    public function getDoctorByNameSpecialityAndLocation(Request $request)
+    {
+        $searchinput = $request->input('searchinput');
+        $searchlocation = $request->input('location');
+        $doctors = Doctor::query();
+
+        if ($searchinput) {
+            $doctors->where(function ($query) use ($searchinput) {
+                $query->whereHas('user', function ($subquery) use ($searchinput) {
+                    $subquery->where('firstname', 'like', '%' . $searchinput . '%')
+                        ->orWhere('lastname', 'like', '%' . $searchinput . '%');
+                })
+                    ->orWhere('specialization', 'like', '%' . $searchinput . '%');
+            });
+        }
+
+        if ($searchlocation) {
+            $doctors->where(function ($query) use ($searchlocation) {
+                $query->where('officeCity', 'like', '%' . $searchlocation . '%')
+                    ->orWhere('officePostalCode', 'like', '%' . $searchlocation . '%');
+            });
+        }
+
+        $doctors = $doctors->get();
+        return response()->json($doctors, 200);
     }
 }
