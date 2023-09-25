@@ -2,6 +2,8 @@
     &__background {
         width: 100%;
         position: absolute;
+        height: 400px;
+        object-fit: cover;
     }
 
     h1 {
@@ -53,6 +55,7 @@
             &-wrapper {
                 padding: 3px;
                 cursor: pointer;
+                display: flex;
 
                 input {
                     border: none;
@@ -67,8 +70,8 @@
             &-background {
                 background: #FEBD75;
                 padding: 16px;
-                border-top-right-radius: 10px;
-                border-bottom-right-radius: 10px;
+                border-top-right-radius: 9px;
+                border-bottom-right-radius: 9px;
                 display: flex;
                 align-items: center;
             }

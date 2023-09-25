@@ -10,7 +10,7 @@ const Connection = () => {
 
 
     return (
-        <div className='home'>
+        <div className='connection'>
             <div className='primary-part'>
                 <div className='logo-container'>
                     <img src="logo.png" alt="logo" className='logo' />

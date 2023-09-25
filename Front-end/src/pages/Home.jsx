@@ -9,102 +9,24 @@ import { useSelector } from 'react-redux';
 
 const Home = () => {
     const user = useSelector((state) => state.userReducer.user);
-    const [data, setData] = useState({});
-    const [modal, setModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    // const [data, setData] = useState({});
+    // const [modal, setModal] = useState(false);
+    // const [isLoading, setIsLoading] = useState(true);
 
+    // const [oldPassword, setOldPassword] = useState();
+    // const [newPassword, setNewPassword] = useState();
+    // const [confirmPassword, setConfirmPassword] = useState();
 
-    const [oldPassword, setOldPassword] = useState();
-    const [newPassword, setNewPassword] = useState();
-    const [confirmPassword, setConfirmPassword] = useState();
-
-    const USER_URL = '/user/veterinary/';
-
-    const [edit, setEdit] = useState(false);
-    const [editFirstname, setEditFirstname] = useState(false);
-    const [editLastname, setEditLastname] = useState(false);
-    const [editAddress, setEditAddress] = useState(false);
-    const [editPhone, setEditPhone] = useState(false);
-    const [editEmail, setEditEmail] = useState(false);
-    const [editSiret, setEditSiret] = useState(false);
+    // const [edit, setEdit] = useState(false);
+    // const [editFirstname, setEditFirstname] = useState(false);
+    // const [editLastname, setEditLastname] = useState(false);
+    // const [editAddress, setEditAddress] = useState(false);
+    // const [editPhone, setEditPhone] = useState(false);
+    // const [editEmail, setEditEmail] = useState(false);
+    // const [editSiret, setEditSiret] = useState(false);
 
     console.log(user)
-    // useEffect(() => {
-    //     if (type === "veterinary") {
-    //         axios.get(USER_URL + id)
-    //             .then(function (response) {
-    //                 setData(response.data);
-    //                 setIsLoading(false);
-    //             })
-    //             .catch(err => console.log(err))
-    //     } else if (type === "client") {
-    //         axios.get("/user/client/" + id)
-    //             .then(function (response) {
-    //                 const infos = response.data;
-    //                 setData(infos);
-    //                 localStorage.setItem('veterinary_id', response.data.veterinary_id);
-    //                 setIsLoading(false);
-    //             })
-    //             .catch(err => console.log(err))
-    //     }
-    // }, []);
 
-    // useEffect(() => {
-    //     console.log(data[0]?.firstname);
-    // }, [data])
-
-    // const updateUser = async () => {
-    //     if (type === "client") {
-    //         try {
-    //             console.log(editAddress, editPhone, editEmail, editFirstname, editLastname);
-    //             console.log(data?.address, data?.phone, data?.email, data?.firstname, data?.lastname);
-    //             const response = await axios.put(
-    //                 "/client/" + data?.id,
-    //                 JSON.stringify({
-    //                     address: (editAddress ? editAddress : data?.address),
-    //                     phone: (editPhone ? editPhone : data?.phone),
-    //                     email: (editEmail ? editEmail : data?.email),
-    //                     veterinary_id: data?.veterinary_id,
-    //                     firstname: (editFirstname ? editFirstname : data?.firstname),
-    //                     lastname: (editLastname ? editLastname : data?.lastname)
-    //                 }),
-    //                 {
-    //                     headers: { 'Content-Type': 'application/json' },
-    //                     // withCredentials: true
-    //                 }
-    //             );
-    //             console.log(response.data);
-    //             setData(response.data);
-    //             setEdit(false);
-    //         } catch (err) {
-    //             console.log(err)
-    //         }
-    //     } else if (type === "veterinary") {
-    //         try {
-    //             console.log(editSiret, editEmail, editFirstname, editLastname);
-    //             console.log(data[0]?.siret, data[0]?.email, data[0]?.firstname, data[0]?.lastname);
-    //             const response = await axios.put(
-    //                 "/veterinary/" + data[0]?.id,
-    //                 JSON.stringify({
-    //                     siret: (editSiret ? editSiret : data[0]?.siret),
-    //                     email: (editEmail ? editEmail : data[0]?.email),
-    //                     veterinary_id: data[0]?.id,
-    //                     firstname: (editFirstname ? editFirstname : data[0]?.firstname),
-    //                     lastname: (editLastname ? editLastname : data[0]?.lastname)
-    //                 }),
-    //                 {
-    //                     headers: { 'Content-Type': 'application/json' },
-    //                     // withCredentials: true
-    //                 }
-    //             );
-    //             console.log(response.data);
-    //             setData([response.data]);
-    //             setEdit(false);
-    //         } catch (err) {
-    //             console.log(err)
-    //         }
-    //     }
-    // }
     // const updatePassword = async () => {
     //     if (type === "client") {
     //         try {
@@ -135,182 +57,45 @@ const Home = () => {
     //     return <Loader />;
     // }
     return (
-        <div className='main-page'>
+        <div className='home'>
             <HomeHeader />
-            
-            {/* <img src="background.png" alt="" className='background' />
-            <Navbar></Navbar>
-
-            {data?.firstname ? (
-                <div className='page_content'>
-                    <div className='user_infos_container'>
-                        <h1>
-                            Bienvenue {data.firstname}
-                            <br />
-                            dans votre espace {type === 'client' ? "client" : "vétérinaire"}
-                        </h1>
-                        <h2>Parcourez la première application de rappel vaccinal automatisé</h2>
-                        <h3>Vos informations personnelles</h3>
-                        <div><span>Date de création de mon compte : </span>{data?.created_at?.slice(0, 10).split('-').reverse().join('/')}</div>
-                        <div>
-                            <span>Nom : </span>{edit ? (
-                                <input
-                                    type="text"
-                                    defaultValue={editLastname ? editLastname : data?.lastname}
-                                    onChange={(e) => setEditLastname(e.target.value)}
-                                />
-                            ) : (data?.lastname)}
-                        </div>
-                        <div><span>Prénom : </span>{edit ? (
-                            <input
-                                type="text"
-                                defaultValue={editFirstname ? editFirstname : data?.firstname}
-                                onChange={(e) => setEditFirstname(e.target.value)}
-                            />
-                        ) : (data?.firstname)}</div>
-
-                        {(type === "client") ? (
-                            <div><span>Adresse postale : </span>{edit ? (
-                                <input
-                                    type="text"
-                                    defaultValue={editAddress ? editAddress : data?.address}
-                                    onChange={(e) => setEditAddress(e.target.value)}
-                                />
-                            ) : (data?.address)}</div>
-                        ) : ""}
-
-                        <div><span>Adresse email : </span>{edit ? (
-                            <input
-                                type="text"
-                                defaultValue={editEmail ? editEmail : data?.email}
-                                onChange={(e) => setEditEmail(e.target.value)}
-                            />
-                        ) : (data?.email)}</div>
-
-                        {(type === "client") ? (
-                            <div><span>Numéro de téléphone : </span>{edit ? (
-                                <input
-                                    type="text"
-                                    defaultValue={editPhone ? editPhone : data?.phone}
-                                    onChange={(e) => setEditPhone(e.target.value)}
-                                />
-                            ) : data?.phone}</div>
-                        ) : ""}
-
-                        <div className='btn_container'>
-                            {edit ?
-                                (<>
-                                    <button className='update_btn' onClick={() => setEdit(false)}>Annuler</button>
-                                    <button className='pwd_btn' onClick={() => updateUser()}>Confirmer</button>
-                                </>) : (
-                                    <>
-                                        <button className='update_btn' onClick={() => setEdit(true)}>Modifier mes informations personnelles</button>
-                                        <button className='pwd_btn' onClick={() => setModal(true)}>Modifier mon mot de passe</button>
-                                    </>)
-                            }
-                        </div>
+            <div className='home__info-wrapper'>
+                <div className='home__info-wrapper-card'>
+                    <img src="home-image1.png" alt="" />
+                    <div className='home__info-wrapper-card-info'>
+                        <h3>Consulter un professionnel</h3>
+                        <p>Filtrer par localisation</p>
                     </div>
                 </div>
-
-            ) : <div className='page_content'>
-                <div className='user_infos_container'>
-                    <h1>
-                        Bienvenue {data[0]?.firstname}
-                        <br />
-                        dans votre espace {type === 'client' ? "client" : "vétérinaire"}
-                    </h1>
-                    <h2>Parcourez la première application de rappel vaccinal automatisé</h2>
-                    <h3>Vos informations personnelles</h3>
-                    <div><span>Date de création de mon compte : </span>{data[0]?.created_at?.slice(0, 10).split('-').reverse().join('/')}</div>
-
-                    {(type === "veterinary") ? (
-                        <div><span>Siret : </span>{edit ? (
-                            <input
-                                type="text"
-                                defaultValue={editSiret ? editSiret : data[0]?.siret}
-                                onChange={(e) => setEditSiret(e.target.value)}
-                            />
-                        ) : (data[0]?.siret)}
-                        </div>
-                    ) : ""}
-
-                    <div>
-                        <span>Nom : </span>{edit ? (
-                            <input
-                                type="text"
-                                defaultValue={editLastname ? editLastname : data[0]?.lastname}
-                                onChange={(e) => setEditLastname(e.target.value)}
-                            />
-                        ) : (data[0]?.lastname)}
+                <div className='home__info-wrapper-card'>
+                    <img src="home-image2.png" alt="" />
+                    <div className='home__info-wrapper-card-info'>
+                        <h3>Prendre rendez-vous</h3>
+                        <p>Facilement en ligne</p>
                     </div>
-                    <div><span>Prénom : </span>{edit ? (
-                        <input
-                            type="text"
-                            defaultValue={editFirstname ? editFirstname : data[0]?.firstname}
-                            onChange={(e) => setEditFirstname(e.target.value)}
-                        />
-                    ) : (data[0]?.firstname)}
-                    </div>
-
-                    <div><span>Adresse email : </span>{edit ? (
-                        <input
-                            type="text"
-                            defaultValue={editEmail ? editEmail : data[0]?.email}
-                            onChange={(e) => setEditEmail(e.target.value)}
-                        />
-                    ) : (data[0]?.email)}
-                    </div>
-
-                    <div className='btn_container'>
-                        {edit ?
-                            (<>
-                                <button className='update_btn' onClick={() => setEdit(false)}>Annuler</button>
-                                <button className='pwd_btn' onClick={() => updateUser()}>Confirmer</button>
-                            </>) : (
-                                <>
-                                    <button className='update_btn' onClick={() => setEdit(true)}>Modifier mes informations personnelles</button>
-                                    <button className='pwd_btn'>Modifier mon mot de passe</button>
-                                </>)
-                        }
-                    </div>
-
                 </div>
             </div>
-            }
-            {modal ? (
-                <div className='modal'>
-                    <div className='input_modal'>
-                        <label htmlFor="old_password">Ancien mot de passe * :</label>
-                        <input
-                            type="password"
-                            id="old_password"
-                            onChange={(e) => setOldPassword(e.target.value)} />
+            <div className='home__explaination'>
+                <h2>Comment ça fonctionne ?</h2>
+                <hr />
+                <div className='home__explaination-text'>
+                    <p className='home__explaination-text-info'>CareConnect est un service en ligne de prise de rendez-vous avec des professionnels de santé que vous pouvez filtrer en fonction de leur localisation et de leur spécialisation</p>
+                </div>
+                <div className='home__explaination-wrapper'>
+                    <div className='home__explaination-wrapper-card'>
+                        <img src="registration.png" alt="" />
+                        <p>Je créé un compte</p>
                     </div>
-
-                    <div className='input_modal'>
-                        <label htmlFor="new_password">Nouveau mot de passe * :</label>
-                        <input
-                            type="password"
-                            id="new_password"
-                            onChange={(e) => setNewPassword(e.target.value)}
-                        />
+                    <div className='home__explaination-wrapper-card'>
+                        <img src="doctor.jpg" alt="" />
+                        <p>Je recherche un spécialiste</p>
                     </div>
-
-                    <div className='input_modal'>
-                        <label htmlFor="confirm_new_password">Confirmer mot de passe * :</label>
-                        <input
-                            type="password"
-                            id="confirm_new_password"
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                        />
-                    </div>
-
-                    <div className='btn_container'>
-                        <button className='confirm' onClick={() => updatePassword()}>Confirmer</button>
-                        <button className='cancel' onClick={() => setModal(false)}>Annuler</button>
+                    <div className='home__explaination-wrapper-card'>
+                        <img src="picto-bleu.png" alt="" />
+                        <p>Je prend rendez-vous avec mon praticien</p>
                     </div>
                 </div>
-            ) : ("")} */}
+            </div>
         </div>
     );
 };
