@@ -3,12 +3,13 @@ import { useRef, useState, useEffect } from 'react';
 import Navbar from '../Navbar';
 import axios from '../../api/axios';
 
-const HomeHeader = () => {
+const HomeHeader = ({ onSearchResult }) => {
     const searchinputRef = useRef();
     const locationRef = useRef();
 
     const [searchinput, setSearchinput] = useState('');
     const [location, setLocation] = useState('');
+    const [searchResult, setSearchResult] = useState('');
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -22,11 +23,16 @@ const HomeHeader = () => {
                     // withCredentials: true
                 }
             );
-            console.log(response.data);
+            setSearchResult(response.data)
         } catch (err) {
             console.log(err);
         }
     }
+
+    useEffect(() => {
+        onSearchResult(searchResult);
+        //eslint-disable-next-line
+    }, [searchResult]);
 
     return (
         <header className='header'>

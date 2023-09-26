@@ -137,6 +137,7 @@ class UserController extends Controller
             });
         }
 
+        $doctors->with('user');
         $doctors = $doctors->get();
         return response()->json($doctors, 200);
     }

@@ -5,6 +5,11 @@
         position: relative;
         margin-top: 110px;
 
+        @media (max-width: 760px) {
+            flex-direction: column;
+            margin-top: 70px;
+        }
+
         &-card {
             width: 35%;
             height: 150px;
@@ -14,6 +19,11 @@
             box-shadow: 2px 2px 2px rgb(230, 230, 230);
             padding: 10px;
             display: flex;
+
+            @media (max-width: 760px) {
+                width: 70%;
+                margin: 10px auto;
+            }
 
             img {
                 width: 45%;
@@ -69,7 +79,9 @@
         &-wrapper {
             display: flex;
             justify-content: space-around;
-            margin: 70px 30px;
+            margin: 70px auto;
+            max-width: 1000px;
+
 
             &-card {
                 width: 25%;
@@ -88,6 +100,65 @@
                 p {
                     font-weight: bold;
                     text-align: center;
+                    padding: 10px;
+                }
+            }
+        }
+    }
+
+    &__result {
+        margin: 50px auto;
+
+        &-wrapper {
+            position: relative;
+            background: #FFFFFF;
+            padding: 40px;
+            display: flex;
+            width: 80%;
+            margin: 10px auto;
+            box-shadow: 2px 2px 2px rgb(230, 230, 230);
+            max-width: 900px;
+
+            &-info {
+                width: 30%;
+            }
+
+            &-appointment {
+                width: 70%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                div {
+                    box-shadow: 0 2px 4px rgba(1, 53, 134, .071), 0 5px 25px rgba(1, 53, 134, .071) !important;
+                    padding: 20px;
+                    text-align: center;
+                    color: #00083E;
+                    width: 100%;
+                }
+            }
+
+            &-name {
+                color: #75b6fe;
+                font-weight: bold;
+            }
+
+            &-specialization {
+                color: #00083E;
+                font-weight: bold;
+                margin: 10px 0 20px;
+            }
+
+            &-btn {
+                button {
+                    background: #75b6fe;
+                    color: #FFFFFF;
+                    margin-top: 20px;
+                    border: none;
+                    padding: 10px;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                    cursor: pointer;
                 }
             }
         }

@@ -24,7 +24,7 @@ const SignUp = (props) => {
     const registerRPPSNumber = useRef();
     const errRef = useRef();
 
-    const specializationList = ["Médecin généraliste", "Cardiologue", "Dermatologue", "Gastro-entérologue", "Pédiatre", "Psychiatre", "Orthopédiste", "Chirurgien", "Ophtalmologiste", "Dentiste", "Gynécologue", "Ostéopathe", "Endocrinologue", "Pneumologue"];
+    const specializationList = ["Médecin généraliste", "Cardiologue", "Dermatologue", "Gastro-entérologue", "Pédiatre", "Psychiatre", "Orthopédiste", "Chirurgien", "Ophtalmologiste", "Dentiste", "Gynécologue", "Ostéopathe", "Endocrinologue", "Pneumologue", "ORL"];
 
     //REGEX
     const USER_REGEX = /^[a-zA-Z][a-zA-Z-éÉèÈàÀùÙâÂêÊîÎôÔûÛïÏëËüÜçÇ]{2,24}$/;
@@ -236,9 +236,6 @@ const SignUp = (props) => {
                         // withCredentials: true
                     }
                 );
-                console.log(response.data);
-                console.log(response.accessToken);
-                console.log(JSON.stringify(response));
                 props.setSuccess(true);
                 props.setSignUp(false);
             } catch (err) {
@@ -567,7 +564,7 @@ const SignUp = (props) => {
                                         <tr>
                                             <td colspan="2" id="socialSecurityNumbernote" className={socialSecurityNumberFocus && socialSecurityNumber && !validSocialSecurityNumber ? "instructions" : "offscreen"}>
                                                 <CgDanger className='danger' />
-                                                14 chiffres obligatoires
+                                                15 chiffres obligatoires
                                             </td>
                                         </tr>
 

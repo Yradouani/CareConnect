@@ -11,6 +11,10 @@
         color: #FFFFFF;
         text-align: center;
         padding-top: 50px;
+
+        @media (max-width: 650px) {
+            padding-top: 20px;
+        }
     }
 
     &__searchbar {
@@ -24,6 +28,12 @@
             background: #FFFFFF;
             border-radius: 10px;
             justify-content: space-between;
+
+            @media (max-width: 650px) {
+                flex-direction: column;
+                width: 70%;
+                background: transparent;
+            }
         }
 
         &-input {
@@ -34,6 +44,11 @@
                 align-items: center;
                 width: 200px;
 
+                @media (max-width: 650px) {
+                    width: auto;
+                    margin: 3px;
+                }
+
                 input {
                     border: none;
                     outline: none;
@@ -42,6 +57,10 @@
 
                 &:first-child {
                     border-right: 1px solid #75b6fe;
+
+                    @media (max-width: 650px) {
+                        border-right: none;
+                    }
                 }
             }
 
@@ -74,6 +93,12 @@
                 border-bottom-right-radius: 9px;
                 display: flex;
                 align-items: center;
+
+                @media (max-width: 650px) {
+                    width: 100%;
+                    border-bottom-left-radius: 9px;
+                    border-top-right-radius: 0;
+                }
             }
 
             &-icon {

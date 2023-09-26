@@ -1,0 +1,51 @@
+.footer {
+    background: #fafafa;
+
+    &__info {
+        background: #fafafa;
+        display: flex;
+        justify-content: space-around;
+        max-width: 1100px;
+        margin: auto;
+
+        &-specilities,
+        &-contact,
+        &-plan {
+            margin: 20px;
+            width: 20%;
+            color: #808080;
+
+            svg {
+                fill: #00083E;
+            }
+
+            &-mail {
+                svg {
+                    color: #00083E;
+                }
+            }
+        }
+    }
+
+    &__legal {
+        background-color: #2a2b2b;
+        padding: 20px;
+
+        p {
+            margin: 0;
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+                margin: 0 3px;
+            }
+        }
+    }
+
+    h2 {
+        color: #00083E;
+        font-weight: bold;
+    }
+}
