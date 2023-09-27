@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Customers from './pages/Customers';
+import Profile from './pages/Profile';
 import { useState } from 'react';
 import Appointments from './pages/Appointments';
 import Connection from './pages/Connection';
@@ -14,7 +14,7 @@ function App() {
         <Routes>
           <Route path='/' exact element={<Connection />} />
           <Route path='/accueil' exact element={<Home />} />
-          <Route path='/clients' exact element={<Customers />} />
+          <Route path='/mon-profil' exact element={<Profile />} />
           <Route path='/rendez-vous' exact element={<Appointments />} />
         </Routes>
       </BrowserRouter>

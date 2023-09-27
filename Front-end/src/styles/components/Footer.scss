@@ -14,15 +14,28 @@
             margin: 20px;
             width: 20%;
             color: #808080;
+            display: flex;
+            flex-direction: column;
 
             svg {
                 fill: #00083E;
+                margin-right: 10px;
             }
 
             &-mail {
+                display: flex;
+
                 svg {
                     color: #00083E;
                 }
+            }
+
+            &-network {
+                margin-bottom: 20px;
+            }
+
+            p {
+                margin-top: 0;
             }
         }
     }

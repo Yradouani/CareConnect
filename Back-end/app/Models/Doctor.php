@@ -104,3 +104,8 @@ class Doctor extends Model
 // VALUES ('Corine', 'Morel', '0123456789', 'doctor', 'corine.morel8@email.com', '$2y$10$juxmmSbgmklUk8kkEkWtju948mRSp0p.t3kMvJM6MMpjkm7fmqA2a');
 // INSERT INTO doctors (user_id, specialization, officeAddress, officePostalCode, officeCity, RPPSNumber)
 // VALUES (LAST_INSERT_ID(), 'Radiologue', '15 rue Victor Hugo', '31001', 'Toulouse', '12345678917');SELECT * FROM `users` WHERE 1
+
+// INSERT INTO users (firstname, lastname, phone, role, email, password)
+// VALUES ('Hélène', 'Jacquemont', '0123456789', 'doctor', 'helene.jacquemont@email.com', '$2y$10$juxmmSbgmklUk8kkEkWtju948mRSp0p.t3kMvJM6MMpjkm7fmqA2a');
+// INSERT INTO doctors (user_id, specialization, officeAddress, officePostalCode, officeCity, RPPSNumber)
+// VALUES (LAST_INSERT_ID(), 'Pédiatre', '16 rue Montaigne', '31001', 'Toulouse', '12345678917');SELECT * FROM `users` WHERE 1

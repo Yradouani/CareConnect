@@ -1,8 +1,15 @@
 @import './settings';
-@import './components/Navbar.scss';
+
+//Headers
 @import './headers/home.scss';
+
+//Pages
 @import './pages/Home.scss';
-@import './components/modal.scss';
 @import './pages/Connection.scss';
+@import './pages/Appointment.scss';
+
+//Components
+@import './components/modal.scss';
+@import './components/Navbar.scss';
 @import './components/Loader.scss';
 @import './components/Footer.scss';

@@ -1,0 +1,53 @@
+.appointments {
+    &-header {
+
+        h1 {
+            margin: 0;
+            padding: 30px;
+            background-color: #75b6fe;
+            color: #FFFFFF;
+        }
+
+        &__nav {
+            display: flex;
+            justify-content: space-between;
+
+            &-item {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                padding: 20px 0;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover {
+                    border-bottom: 2px solid #75b6fe;
+                    color: #75b6fe !important;
+                }
+            }
+
+            .item-active {
+                border-bottom: 2px solid #75b6fe;
+                color: #75b6fe !important;
+            }
+        }
+    }
+
+    &-main {
+        &__button {
+            margin: 50px auto;
+            display: flex;
+            justify-content: center;
+
+            button {
+                background: #FEBD75;
+                color: #FFFFFF;
+                font-weight: bold;
+                padding: 15px;
+                border: none;
+                font-size: 15px;
+                cursor: pointer;
+            }
+        }
+    }
+}
