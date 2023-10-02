@@ -50,4 +50,88 @@
             }
         }
     }
+
+    &__modal {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 160px;
+        background: white;
+        padding-top: 50px;
+
+        h2 {
+            text-align: center;
+            color: #00083E;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            margin: 30px auto;
+            width: 70%;
+            max-width: 280px;
+
+            label {
+                margin-bottom: 5px;
+                color: #00083E;
+                display: flex;
+
+                .invalid,
+                .valid {
+                    margin-right: 10px;
+                }
+            }
+
+            input {
+                margin-bottom: 15px;
+                padding: 10px;
+            }
+
+            input[type=submit] {
+                background-color: #FEBD75;
+                border: none;
+                color: #00083E;
+                cursor: pointer;
+                font-weight: bold;
+                padding: 15px 10px;
+                font-size: 16px;
+                transition: all 0.2s;
+
+                &:hover {
+                    background-color: #00083E;
+                    color: #FEBD75;
+                }
+            }
+
+            button {
+                background-color: #00083E;
+                color: #FEBD75;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+                padding: 15px 10px;
+                font-size: 16px;
+                transition: all 0.2s;
+
+                &:hover {
+                    background-color: #FEBD75;
+                    color: #00083E;
+                }
+            }
+
+            #datenote,
+            #timenote {
+                font-size: 10px;
+                color: red;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+            }
+
+            .danger {
+                color: red;
+                margin-right: 3px;
+            }
+        }
+    }
 }
