@@ -43,7 +43,10 @@ class AppointmentController extends Controller
     public function getAllAppointmentsOfOneDoctor($id)
     {
         try {
-            $appointments = Appointment::where('doctor_id', $id)->get();
+            $appointments = Appointment::where('doctor_id', $id)
+                ->orderBy('dateOfAppointment', 'asc')
+                ->orderBy('timeOfAppointment', 'asc')
+                ->get();
             return response()->json($appointments, 200);
         } catch (Exception $e) {
             echo '</br> <b> Exception Message: ' . $e->getMessage() . '</b>';

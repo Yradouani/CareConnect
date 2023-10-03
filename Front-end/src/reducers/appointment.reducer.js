@@ -9,15 +9,24 @@ export default function appointmentReducer(state = initialState, action) {
                 appointment: action.payload,
             };
         case 'ADD_APPOINTMENT':
-            return {
-                ...state,
-                appointment: [...state.appointment, action.payload],
-            };
-        case 'DELETE_APPOINTMENT':
-            const updatedAppointments = state.appointment.filter(appointment => appointment.id !== action.payload);
+            const newAppointment = action.payload;
+            const updatedAppointments = [...state.appointment, newAppointment];
+
+            updatedAppointments.sort((a, b) => {
+                const dateA = new Date(a.dateOfAppointment + ' ' + a.timeOfAppointment);
+                const dateB = new Date(b.dateOfAppointment + ' ' + b.timeOfAppointment);
+                return dateA - dateB;
+            });
+
             return {
                 ...state,
                 appointment: updatedAppointments,
+            };
+        case 'DELETE_APPOINTMENT':
+            const deleteAppointments = state.appointment.filter(appointment => appointment.id !== action.payload);
+            return {
+                ...state,
+                appointment: deleteAppointments,
             };
         case 'CLEANAPPOINTMENTS':
             return {

@@ -24,10 +24,11 @@ const Appointments = () => {
             navigate('/');
         }
     }, [user, navigate]);
-    
+
     const appointments = useSelector((state) => state.appointmentReducer.appointment);
     const dispatch = useDispatch();
     const userId = user.id;
+    const uniqueDays = [];
     const [isLoading, setIsLoading] = useState(true);
     const [dateAppointment, setDateAppointment] = useState("today");
     const [modal, setOpenModal] = useState(false);
@@ -62,8 +63,6 @@ const Appointments = () => {
     }, [dateOfAppointment, timeOfAppointment])
 
     useEffect(() => {
-
-        console.log(appointments)
         const pastAppointments = [];
         const currentAppointments = [];
         const futureAppointments = [];
@@ -83,14 +82,18 @@ const Appointments = () => {
                     futureAppointments.push(appointment);
                 }
             })
-
-            futureAppointments.forEach((appointment) => {
-                console.log(appointment.dateOfAppointment)
-            })
             setPastAppointments(pastAppointments);
             setCurrentAppointments(currentAppointments);
             setFutureAppointments(futureAppointments);
         }
+
+        appointments.forEach(appointment => {
+            const day = appointment.dateOfAppointment;
+            if (!uniqueDays.includes(day)) {
+                uniqueDays.push(day);
+            }
+        });
+        console.log(uniqueDays)
         // eslint-disable-next-line
     }, [appointments]);
 
@@ -104,10 +107,6 @@ const Appointments = () => {
         const currentDay = currentDate.getDate();
         const currentMonth = currentDate.getMonth();
         const currentYear = currentDate.getFullYear();
-
-        console.log(appointmentYear + " " + currentYear)
-        console.log(appointmentMonth + " " + currentMonth)
-        console.log(appointmentDay + " " + currentDay)
 
         if (appointmentYear === currentYear && appointmentMonth === currentMonth && appointmentDay === currentDay && timeOfAppointment) {
             const currentHour = currentDate.getHours();
@@ -124,10 +123,8 @@ const Appointments = () => {
                 (appointmentMonth > currentMonth ||
                     (appointmentMonth === currentMonth && appointmentDay >= currentDay)))
         ) {
-            console.log("salut")
             return true;
         } else {
-            console.log("au revoir")
             return false;
         }
     }
@@ -226,10 +223,6 @@ const Appointments = () => {
         }
     }
 
-    useEffect(() => {
-        console.log(dateAppointment);
-        //eslint-disable-next-line
-    }, [dateAppointment])
     // if (isLoading) {
     //     return <Loader />;
     // }
@@ -269,18 +262,19 @@ const Appointments = () => {
                 {dateAppointment === "today" ? (
                     currentAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
-                            {currentAppointments.map((appointment) => (
-                                <div key={appointment.id} className={`appointments-main__container-item ${appointment.available ? 'available' : 'unavailable'}`}>
-                                    <div >
-                                        <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
-                                        <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
-                                        <div>{appointment.available ? "disponible" : "réservé"}</div>
+                            {
+                                currentAppointments.map((appointment) => (
+                                    <div key={appointment.id} className={`appointments-main__container-item ${appointment.available ? 'available' : 'unavailable'}`}>
+                                        <div >
+                                            <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
+                                            <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
+                                            <div>{appointment.available ? "disponible" : "réservé"}</div>
+                                        </div>
+                                        <BsTrash
+                                            onClick={() => deleteAppointment(appointment.id)}
+                                        />
                                     </div>
-                                    <BsTrash
-                                        onClick={() => deleteAppointment(appointment.id)}
-                                    />
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     ) : (
                         <div className='appointments-main__container'>
