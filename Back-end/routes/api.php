@@ -24,6 +24,7 @@ Route::post('/recherche', [UserController::class, "getDoctorByNameSpecialityAndL
 
 //Appointments
 Route::post('/ajouter-un-rendez-vous', [AppointmentController::class, "addAppointment"]);
+Route::post('/annuler-un-rendez-vous/{id}', [AppointmentController::class, "deleteAppointment"]);
 Route::get('/rendez-vous/{id}', [AppointmentController::class, "getAllAppointmentsOfOneDoctor"]);
 
 

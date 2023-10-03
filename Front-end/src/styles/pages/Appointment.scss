@@ -49,6 +49,36 @@
                 cursor: pointer;
             }
         }
+
+        &__container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+
+            &-item {
+                padding: 20px 40px;
+                margin-bottom: 7px;
+                width: 200px;
+                text-align: center;
+                display: flex;
+                justify-content: space-around;
+                align-items: center;
+
+                svg{
+                    cursor: pointer;
+                }
+            }
+
+            .available {
+                background-color: greenyellow;
+            }
+
+            .unavailable {
+                background-color: #00083E;
+            }
+        }
     }
 
     &__modal {

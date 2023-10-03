@@ -2,6 +2,7 @@ import React from 'react';
 import { useRef, useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../actions/user.action';
+import { setAppointments } from '../actions/appointment.action';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom'
 
@@ -47,6 +48,24 @@ const Login = () => {
                 role: response?.data?.user.role,
             };
             dispatch(setUser(userData));
+
+            try {
+                const response = await axios.get(
+                    `/rendez-vous/${userData.id}`,
+                    {
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                );
+
+                const tab = [];
+                Object.entries(response.data).forEach(item => {
+                    tab.push(item[1])
+                })
+                dispatch(setAppointments(tab));
+            } catch (err) {
+                console.error('Erreur lors de la récupération des rendez-vous :', err);
+            }
+
             navigate('/accueil');
         } catch (err) {
             console.log(err);

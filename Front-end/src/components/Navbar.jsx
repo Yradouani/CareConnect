@@ -5,6 +5,7 @@ import { MdDateRange } from "react-icons/md";
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../actions/user.action';
+import { cleanAppointments } from '../actions/appointment.action';
 
 const Navbar = () => {
     const user = useSelector((state) => state.userReducer.user);
@@ -12,16 +13,16 @@ const Navbar = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    console.log(user)
     useEffect(() => {
         if (!user) {
             navigate('/');
         }
     }, [user, navigate]);
-    // const deconnection = () => {
-    //     dispatch(logout());
-    //     navigate('/');
-    // };
+    const deconnection = () => {
+        dispatch(logout());
+        dispatch(cleanAppointments());
+        navigate('/');
+    };
 
     const openNavModal = async (e) => {
         setOpenModal(true);
@@ -39,7 +40,7 @@ const Navbar = () => {
                 <NavLink to="/rendez-vous" className={(nav) => (nav.isActive ? "nav-active" : "")}>
                     <li><MdDateRange /> Mes rendez-vous</li>
                 </NavLink>
-                <NavLink onClick={() => setOpenModal(true)}>
+                <NavLink onClick={() => deconnection()}>
                     <li><FaPowerOff /> Déconnexion</li>
                 </NavLink>
             </ul>

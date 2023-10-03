@@ -1,10 +1,14 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import axios from '../api/axios';
+import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Loader from '../components/Loader';
 import Footer from '../components/Footer';
+import { addAppointment, deleteAppointmentInStore } from '../actions/appointment.action';
+import Swal from 'sweetalert2';
+import { BsTrash } from "react-icons/bs";
 
 
 //Icons
@@ -14,14 +18,22 @@ import { ImCross } from "react-icons/im";
 
 const Appointments = () => {
     const user = useSelector((state) => state.userReducer.user);
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!user) {
+            navigate('/');
+        }
+    }, [user, navigate]);
+    
+    const appointments = useSelector((state) => state.appointmentReducer.appointment);
+    const dispatch = useDispatch();
     const userId = user.id;
     const [isLoading, setIsLoading] = useState(true);
     const [dateAppointment, setDateAppointment] = useState("today");
     const [modal, setOpenModal] = useState(false);
-    const [appointments, setAppointments] = useState('');
-    const [pastAppointments, setPastAppointments] = useState([]);
-    const [currentAppointments, setCurrentAppointments] = useState([]);
-    const [futureAppointments, setFutureAppointments] = useState([]);
+    const [pastAppointments, setPastAppointments] = useState('');
+    const [currentAppointments, setCurrentAppointments] = useState('');
+    const [futureAppointments, setFutureAppointments] = useState('');
 
     const [dateOfAppointment, setDateOfAppointment] = useState('');
     const [validDateOfAppointment, setValidDateOfAppointment] = useState(false);
@@ -44,14 +56,10 @@ const Appointments = () => {
 
     useEffect(() => {
         const isTimeOfAppointment = TIME_REGEX.test(timeOfAppointment);
-        setValidTimeOfAppointment(isTimeOfAppointment);
+        const isNotPassed = isNotYetPassed(dateOfAppointment, timeOfAppointment);
+        setValidTimeOfAppointment(isTimeOfAppointment && isNotPassed);
         //eslint-disable-next-line
-    }, [timeOfAppointment])
-
-    useEffect(() => {
-        getAllAppointmentsOfOneDoctor();
-        //eslint-disable-next-line
-    }, [userId]);
+    }, [dateOfAppointment, timeOfAppointment])
 
     useEffect(() => {
 
@@ -63,16 +71,22 @@ const Appointments = () => {
         if (appointments.length > 0) {
             appointments.forEach(appointment => {
                 const appointmentDate = new Date(appointment.dateOfAppointment);
-
-                if (appointmentDate < currentDate) {
-                    pastAppointments.push(appointment);
-                } else if (appointmentDate.toDateString() === currentDate.toDateString()) {
+                if (
+                    appointmentDate.getFullYear() === currentDate.getFullYear() &&
+                    appointmentDate.getMonth() === currentDate.getMonth() &&
+                    appointmentDate.getDate() === currentDate.getDate()
+                ) {
                     currentAppointments.push(appointment);
+                } else if (appointmentDate < currentDate) {
+                    pastAppointments.push(appointment);
                 } else {
                     futureAppointments.push(appointment);
                 }
             })
 
+            futureAppointments.forEach((appointment) => {
+                console.log(appointment.dateOfAppointment)
+            })
             setPastAppointments(pastAppointments);
             setCurrentAppointments(currentAppointments);
             setFutureAppointments(futureAppointments);
@@ -80,27 +94,41 @@ const Appointments = () => {
         // eslint-disable-next-line
     }, [appointments]);
 
-    function isNotYetPassed(dateOfAppointment) {
+    const isNotYetPassed = (dateOfAppointment, timeOfAppointment = null) => {
         const appointmentDate = new Date(dateOfAppointment);
         const currentDate = new Date();
+        const appointmentDay = appointmentDate.getDate();
+        const appointmentMonth = appointmentDate.getMonth();
+        const appointmentYear = appointmentDate.getFullYear();
 
-        currentDate.setHours(currentDate.getHours() + 1);
-        if (appointmentDate >= currentDate) {
+        const currentDay = currentDate.getDate();
+        const currentMonth = currentDate.getMonth();
+        const currentYear = currentDate.getFullYear();
+
+        console.log(appointmentYear + " " + currentYear)
+        console.log(appointmentMonth + " " + currentMonth)
+        console.log(appointmentDay + " " + currentDay)
+
+        if (appointmentYear === currentYear && appointmentMonth === currentMonth && appointmentDay === currentDay && timeOfAppointment) {
+            const currentHour = currentDate.getHours();
+            const tab = timeOfAppointment.split(":");
+            const appointmentHour = tab[0]
+            if ((currentHour + 1) <= appointmentHour) {
+                return true
+            } else {
+                return false;
+            }
+        } else if (
+            (appointmentYear > currentYear) ||
+            (appointmentYear === currentYear &&
+                (appointmentMonth > currentMonth ||
+                    (appointmentMonth === currentMonth && appointmentDay >= currentDay)))
+        ) {
+            console.log("salut")
             return true;
         } else {
-            return false
-        }
-    }
-
-    const dateFormateur = (date) => {
-        let days = Math.floor((new Date() - new Date(date)) / (1000 * 3600 * 24))
-
-        if (days === 0) {
-            return "Aujourd'hui";
-        } else if (days > 1) {
-            return "Passé";
-        } else {
-            return "À venir"
+            console.log("au revoir")
+            return false;
         }
     }
 
@@ -111,17 +139,41 @@ const Appointments = () => {
         setOpenModal(false)
     }
 
-    const getAllAppointmentsOfOneDoctor = async () => {
+    const deleteAppointment = async (id) => {
         try {
-            const response = await axios.get(
-                `/rendez-vous/${userId}`,
+            const response = await axios.post(
+                `/annuler-un-rendez-vous/${id}`,
                 {
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
                 }
             );
-            setAppointments(Object.entries(response.data))
+            console.log(response.data)
+
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Créneau supprimer avec succès',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+            dispatch(deleteAppointmentInStore(id))
         } catch (err) {
-            console.error('Erreur lors de la récupération des rendez-vous :', err);
+            console.log(err);
+
+            if (err.response.status === 404) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ce créneau est introuvable',
+                    text: 'Veuillez supprimer un autre créneau',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur lors de la suppression du créneau',
+                    text: 'Veuillez réessayer.',
+                });
+            }
         }
     }
 
@@ -143,9 +195,34 @@ const Appointments = () => {
             setOpenModal(false);
             setDateOfAppointment('');
             setTimeOfAppointment('');
+            setDateAppointment("today")
             console.log(response.data)
+
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Créneau ouvert avec succès',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+            dispatch(addAppointment(response.data))
         } catch (err) {
             console.log(err);
+
+            if (err.response.status === 400) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ce créneau est déjà ouvert',
+                    text: 'Veuillez choisir une autre date/heure',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur lors de l\'ajout du rendez-vous',
+                    text: 'Veuillez réessayer.',
+                });
+            }
         }
     }
 
@@ -191,11 +268,22 @@ const Appointments = () => {
                 ) : ""}
                 {dateAppointment === "today" ? (
                     currentAppointments.length > 0 ? (
-                        <div>
-                            mes rendez-vous d'aujourd'hui
+                        <div className='appointments-main__container'>
+                            {currentAppointments.map((appointment) => (
+                                <div key={appointment.id} className={`appointments-main__container-item ${appointment.available ? 'available' : 'unavailable'}`}>
+                                    <div >
+                                        <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
+                                        <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
+                                        <div>{appointment.available ? "disponible" : "réservé"}</div>
+                                    </div>
+                                    <BsTrash
+                                        onClick={() => deleteAppointment(appointment.id)}
+                                    />
+                                </div>
+                            ))}
                         </div>
                     ) : (
-                        <div>
+                        <div className='appointments-main__container'>
                             Vous n'avez aucun rendez-vous aujourd'hui
                         </div>
                     )
@@ -204,16 +292,22 @@ const Appointments = () => {
                 )}
                 {dateAppointment === "future" ? (
                     futureAppointments.length > 0 ? (
-                        <div>
-                            {futureAppointments.map(appointment => (
-                                <div>
-                                    {appointment.dateOfAppointment}
-                                    {appointment.timeOfAppointment}
+                        <div className='appointments-main__container'>
+                            {futureAppointments.map((appointment) => (
+                                <div key={appointment.id} className={`appointments-main__container-item ${appointment.available ? 'available' : 'unavailable'}`}>
+                                    <div >
+                                        <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
+                                        <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
+                                        <div>{appointment.available ? "disponible" : "réservé"}</div>
+                                    </div>
+                                    <BsTrash
+                                        onClick={() => deleteAppointment(appointment.id)}
+                                    />
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <div>
+                        <div className='appointments-main__container'>
                             Vous n'avez aucun futurs rendez-vous
                         </div>
                     )
@@ -222,11 +316,17 @@ const Appointments = () => {
                 )}
                 {dateAppointment === "past" ? (
                     pastAppointments.length > 0 ? (
-                        <div>
-                            mes rendez-vous passés
+                        <div className='appointments-main__container'>
+                            {pastAppointments.map((appointment) => (
+                                <div key={appointment[1].id} className="appointments-main__container-item unavailable">
+                                    <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
+                                    <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
+                                    <div>passé</div>
+                                </div>
+                            ))}
                         </div>
                     ) : (
-                        <div>
+                        <div className='appointments-main__container'>
                             Vous n'avez aucun rendez-vous passés
                         </div>
                     )
@@ -245,7 +345,7 @@ const Appointments = () => {
                             <span className={validDateOfAppointment || !dateOfAppointment ? "hide" : "invalid"}>
                                 <ImCross />
                             </span>
-                            Date du rendez-vous :*
+                            Date du rendez-vous* :
                         </label>
                         <input
                             type="date"
@@ -270,7 +370,7 @@ const Appointments = () => {
                             <span className={validTimeOfAppointment || !timeOfAppointment ? "hide" : "invalid"}>
                                 <ImCross />
                             </span>
-                            Heure du rendez-vous :*</label>
+                            Heure du rendez-vous* :</label>
                         <input
                             type="time"
                             name="appointment-time"
@@ -284,7 +384,7 @@ const Appointments = () => {
                         />
                         <div id="timenote" className={timeOfAppointmentFocus && timeOfAppointment && !validTimeOfAppointment ? "instructions" : "offscreen"}>
                             <CgDanger className='danger' />
-                            Heure invalide (veuillez respectez le format HH-MM)
+                            Heure invalide (au moins une heure après l'heure actuelle)
                         </div>
 
                         <input type="submit" value="Valider" />
