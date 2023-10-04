@@ -163,4 +163,12 @@
             }
         }
     }
+
+    &__makeappointment {
+        margin: 50px auto;
+        background: white;
+        position: absolute;
+        width: 100%;
+        min-height: 800px;
+    }
 }

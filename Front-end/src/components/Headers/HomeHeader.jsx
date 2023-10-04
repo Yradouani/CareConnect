@@ -19,8 +19,7 @@ const HomeHeader = ({ onSearchResult }) => {
                 "/recherche",
                 JSON.stringify({ searchinput, location }),
                 {
-                    headers: { 'Content-Type': 'application/json' },
-                    // withCredentials: true
+                    headers: { 'Content-Type': 'application/json' }
                 }
             );
             setSearchResult(response.data)

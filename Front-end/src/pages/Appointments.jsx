@@ -18,16 +18,16 @@ import { ImCross } from "react-icons/im";
 
 const Appointments = () => {
     const user = useSelector((state) => state.userReducer.user);
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (!user) {
-            navigate('/');
-        }
-    }, [user, navigate]);
+    // const navigate = useNavigate();
+    // useEffect(() => {
+    //     if (!user) {
+    //         navigate('/');
+    //     }
+    // }, [user, navigate]);
 
     const appointments = useSelector((state) => state.appointmentReducer.appointment);
     const dispatch = useDispatch();
-    const userId = user.id;
+    const userId = user?.id;
     const uniqueDays = [];
     const [isLoading, setIsLoading] = useState(true);
     const [dateAppointment, setDateAppointment] = useState("today");
@@ -67,7 +67,7 @@ const Appointments = () => {
         const currentAppointments = [];
         const futureAppointments = [];
         const currentDate = new Date();
-        if (appointments.length > 0) {
+        if (appointments?.length > 0) {
             appointments.forEach(appointment => {
                 const appointmentDate = new Date(appointment.dateOfAppointment);
                 if (
@@ -87,7 +87,7 @@ const Appointments = () => {
             setFutureAppointments(futureAppointments);
         }
 
-        appointments.forEach(appointment => {
+        appointments?.forEach(appointment => {
             const day = appointment.dateOfAppointment;
             if (!uniqueDays.includes(day)) {
                 uniqueDays.push(day);
@@ -251,7 +251,7 @@ const Appointments = () => {
                 </div>
             </header>
             <div className='appointments-main'>
-                {user.role === "doctor" ? (
+                {user?.role === "doctor" ? (
                     <div
                         className='appointments-main__button'
                         onClick={() => openModal()}
@@ -312,7 +312,7 @@ const Appointments = () => {
                     pastAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
                             {pastAppointments.map((appointment) => (
-                                <div key={appointment[1].id} className="appointments-main__container-item unavailable">
+                                <div key={appointment.id} className="appointments-main__container-item unavailable">
                                     <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
                                     <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
                                     <div>passé</div>

@@ -14,7 +14,7 @@ function App() {
         <Routes>
           <Route path='/' exact element={<Connection />} />
           <Route path='/accueil' exact element={<Home />} />
-          <Route path='/mon-profil' exact element={<Profile />} />
+          <Route path='//profil' exact element={<Profile />} />
           <Route path='/rendez-vous' exact element={<Appointments />} />
         </Routes>
       </BrowserRouter>

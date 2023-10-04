@@ -139,6 +139,20 @@ class UserController extends Controller
 
         $doctors->with('user');
         $doctors = $doctors->get();
-        return response()->json($doctors, 200);
+
+        $doctorsAndAppointments = [];
+        foreach ($doctors as $doctor) {
+            $doctorData = $doctor->toArray();
+
+            $appointment = $doctor->appointments()
+                ->where('dateOfAppointment', '>=', now())
+                ->orderBy('dateOfAppointment')
+                ->first();
+
+            $doctorData['appointments'] = $appointment;
+            $doctorsAndAppointments[] = $doctorData;
+        }
+
+        return response()->json($doctorsAndAppointments, 200);
     }
 }

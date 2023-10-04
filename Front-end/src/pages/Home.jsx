@@ -12,9 +12,15 @@ const Home = () => {
     const user = useSelector((state) => state.userReducer.user);
 
     const [searchResult, setSearchResult] = useState(false);
+    const [takeAppointment, setTakeAppointment] = useState(false);
+
     const handleSearchResult = (result) => {
         setSearchResult(result);
     };
+
+    const makeAnAppointment = (result) => {
+        setTakeAppointment(result);
+    }
     // const [isLoading, setIsLoading] = useState(true);
 
     console.log(user)
@@ -26,7 +32,11 @@ const Home = () => {
             <HomeHeader onSearchResult={handleSearchResult} />
             {searchResult ?
                 (
-                    <div className='home__result'>
+                    takeAppointment ? (
+                        <div className='home__makeappointment'>
+                            je prend un rendez-vous
+                        </div>
+                    ) : (<div className='home__result'>
                         {searchResult.map((result, index) => (
                             <div className='home__result-wrapper' key={index}>
                                 <div className='home__result-wrapper-info'>
@@ -34,14 +44,25 @@ const Home = () => {
                                     <div className='home__result-wrapper-specialization'>{result.specialization}</div>
                                     <div className='home__result-wrapper-address'>{result.officeAddress}</div>
                                     <div>{result.officePostalCode} {result.officeCity}</div>
-                                    <div className='home__result-wrapper-btn'><button>Prendre rendez-vous</button></div>
+                                    <div className='home__result-wrapper-btn'>
+                                        <button
+                                            onClick={result => makeAnAppointment(result)}
+                                        >Prendre rendez-vous
+                                        </button>
+                                    </div>
                                 </div>
                                 <div className='home__result-wrapper-appointment'>
-                                    <div>Prochain rendez-vous le</div>
+                                    {
+                                        result.appointments ? (
+                                            <div>Prochain rendez-vous le {result.appointments.dateOfAppointment} à {result.appointments.timeOfAppointment}</div>
+                                        ) : (
+                                            <div>Aucun rendez-vous disponible avec ce praticien</div>
+                                        )
+                                    }
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </div>)
                 ) : (
                     <div>
                         <div className='home__info-wrapper'>
