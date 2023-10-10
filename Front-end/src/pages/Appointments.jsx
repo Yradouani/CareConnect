@@ -140,11 +140,14 @@ const Appointments = () => {
         try {
             const response = await axios.post(
                 `/annuler-un-rendez-vous/${id}`,
+                {},
                 {
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`,
+                    },
                 }
             );
-            console.log(response.data)
 
             if (response.status === 200) {
                 Swal.fire({
@@ -185,8 +188,10 @@ const Appointments = () => {
                     doctor_id: userId
                 }),
                 {
-                    headers: { 'Content-Type': 'application/json' },
-                    // withCredentials: true
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    },
                 }
             );
             setOpenModal(false);

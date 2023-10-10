@@ -23,10 +23,11 @@ Route::post('/mon-compte', [UserController::class, "getUserById"]);
 Route::post('/recherche', [UserController::class, "getDoctorByNameSpecialityAndLocation"]);
 
 //Appointments
-Route::post('/ajouter-un-rendez-vous', [AppointmentController::class, "addAppointment"]);
-Route::post('/annuler-un-rendez-vous/{id}', [AppointmentController::class, "deleteAppointment"]);
-Route::get('/rendez-vous/{id}', [AppointmentController::class, "getAllAppointmentsOfOneDoctor"]);
-
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/annuler-un-rendez-vous/{id}', [AppointmentController::class, "deleteAppointment"]);
+    Route::post('/ajouter-un-rendez-vous', [AppointmentController::class, "addAppointment"]);
+    Route::get('/rendez-vous/{id}', [AppointmentController::class, "getAllAppointmentsOfOneDoctor"]);
+});
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

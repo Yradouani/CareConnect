@@ -10,7 +10,7 @@ import Footer from '../components/Footer';
 
 const Home = () => {
     const user = useSelector((state) => state.userReducer.user);
-
+    
     const [searchResult, setSearchResult] = useState(false);
     const [takeAppointment, setTakeAppointment] = useState(false);
 
