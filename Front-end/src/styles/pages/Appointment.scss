@@ -36,6 +36,15 @@
     &-main {
         margin-top: 50px;
 
+        .rbc-calendar {
+            padding: 20px;
+
+            .rbc-time-header-gutter {
+                max-width: none !important;
+                min-width: 57px !important;
+            }
+        }
+
         &__button {
             margin: 50px auto;
             display: flex;
@@ -94,6 +103,7 @@
         top: 190px;
         background: white;
         padding-top: 50px;
+        z-index: 10;
 
         h2 {
             text-align: center;

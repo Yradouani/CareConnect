@@ -9,12 +9,17 @@ import Footer from '../components/Footer';
 import { addAppointment, deleteAppointmentInStore } from '../actions/appointment.action';
 import Swal from 'sweetalert2';
 import { BsTrash } from "react-icons/bs";
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import moment from 'moment';
+import 'moment/locale/fr';
 
 
 //Icons
 import { CgDanger } from "react-icons/cg";
 import { BsCheckLg } from "react-icons/bs";
 import { ImCross } from "react-icons/im";
+import DeleteButton from '../components/DeleteButton';
 
 const Appointments = () => {
     const user = useSelector((state) => state.userReducer.user);
@@ -26,6 +31,74 @@ const Appointments = () => {
     // }, [user, navigate]);
 
     const appointments = useSelector((state) => state.appointmentReducer.appointment);
+
+    moment.locale('fr');
+    const localizer = momentLocalizer(moment);
+    const events = appointments.map((appointment, index) => {
+        const dateOfAppointment = new Date(appointment.dateOfAppointment);
+        const timeOfAppointment = appointment.timeOfAppointment;
+
+        const [hours, minutes] = timeOfAppointment.split(':');
+        dateOfAppointment.setHours(hours);
+        dateOfAppointment.setMinutes(minutes);
+
+        const endDate = new Date(dateOfAppointment.getTime() + 30 * 60000);
+        return {
+            id: appointment.id,
+            title: "",
+            start: dateOfAppointment,
+            end: endDate,
+        };
+    });
+
+    useEffect(() => {
+        const setEventColors = () => {
+            const cases = document.querySelectorAll(".rbc-event");
+
+            cases.forEach((element, index) => {
+                const appointment = appointments[index];
+                if (appointment && appointment.patient_id) {
+                    element.style.backgroundColor = "blue";
+                } else {
+                    element.style.backgroundColor = "green";
+                }
+            });
+        };
+        setEventColors();
+    }, [appointments]);
+
+    const getValidRange = () => {
+        const today = new Date();
+        const startHour = 8;
+        const endHour = 20;
+        const validStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), startHour, 0, 0);
+        const validEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate(), endHour, 0, 0);
+
+        return [validStart, validEnd];
+    };
+
+    const customMessages = {
+        today: "Aujourd'hui",
+        next: "Semaine suivante",
+        previous: "Semaine précédente",
+        week: "Semaine",
+        day: "Jour",
+        date: "Date",
+        time: "Heure",
+        event: "Événement",
+    };
+
+    const customFormats = {
+        dayFormat: (date, culture, localizer) =>
+            localizer.format(date, 'dddd', culture),
+        dayRangeHeaderFormat: ({ start, end }, culture, localizer) => {
+            const formattedStart = localizer.format(start, 'D MMMM', culture);
+            const formattedEnd = localizer.format(end, 'D MMMM', culture);
+            return `Semaine du ${formattedStart} au ${formattedEnd}`;
+        },
+    };
+
+    const validRange = getValidRange();
     const dispatch = useDispatch();
     const userId = user?.id;
     const uniqueDays = [];
@@ -231,13 +304,29 @@ const Appointments = () => {
     // if (isLoading) {
     //     return <Loader />;
     // }
-
+    const handleEventClick = (event) => {
+        Swal.fire({
+            title: 'Annuler le rendez-vous ?',
+            text: 'Voulez-vous vraiment annuler ce rendez-vous ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, annuler',
+            cancelButtonText: 'Non, conserver',
+            confirmButtonColor: '#d33',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                deleteAppointment(event)
+            }
+        });
+    }
+    const defaultView = 'week';
+    const views = { month: false, week: true, day: false, agenda: false }
     return (
         <div className='appointments'>
             <Navbar />
             <header className='appointments-header'>
                 <h1>Mes rendez-vous</h1>
-                <div className='appointments-header__nav'>
+                {/* <div className='appointments-header__nav'>
                     <div
                         className={dateAppointment === "past" ? "appointments-header__nav-item item-active" : "appointments-header__nav-item"}
                         onClick={() => setDateAppointment("past")}
@@ -253,7 +342,7 @@ const Appointments = () => {
                         onClick={() => setDateAppointment("future")}
                     >À venir
                     </div>
-                </div>
+                </div> */}
             </header>
             <div className='appointments-main'>
                 {user?.role === "doctor" ? (
@@ -264,6 +353,28 @@ const Appointments = () => {
                         <button>Ouvrir un nouveau créneau</button>
                     </div>
                 ) : ""}
+                <Calendar
+                    views={views}
+                    defaultView={defaultView}
+                    localizer={localizer}
+                    events={events}
+                    startAccessor="start"
+                    endAccessor="end"
+                    style={{ height: 800 }}
+                    min={validRange[0]}
+                    max={validRange[1]}
+                    messages={customMessages}
+                    formats={customFormats}
+                    onSelectEvent={(event) => handleEventClick(event.id)}
+                // components={{
+                //     eventWrapper: ({ event }) => (
+                //         <div >
+
+                //             {event.start.getHours()} Supprimer
+                //         </div>
+                //     ),
+                // }}
+                />
                 {dateAppointment === "today" ? (
                     currentAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
