@@ -170,5 +170,39 @@
         position: absolute;
         width: 100%;
         min-height: 800px;
+
+        &-wrapper {
+            display: flex;
+            flex-direction: column;
+
+            &-item {
+                background: aliceblue;
+                padding: 10px;
+                margin: 10px auto;
+                cursor: pointer;
+                width: 100%;
+            }
+
+            &-date {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+
+                h3{
+                    margin-top: 30px;
+                }
+            }
+
+            h2 {
+                text-align: center;
+                margin-top: 50px;
+            }
+        }
+
+        &-container {
+            display: block ruby;
+            width: 250px;
+            text-align: center;
+        }
     }
 }

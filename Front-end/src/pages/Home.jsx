@@ -10,18 +10,67 @@ import Footer from '../components/Footer';
 
 const Home = () => {
     const user = useSelector((state) => state.userReducer.user);
-    
+
     const [searchResult, setSearchResult] = useState(false);
     const [takeAppointment, setTakeAppointment] = useState(false);
+    const [appointmentOfSelectedDoctor, setAppointmentOfSelectedDoctor] = useState(null);
+    const [appointmentDay, setAppointmentDay] = useState(null);
 
     const handleSearchResult = (result) => {
         setSearchResult(result);
     };
 
-    const makeAnAppointment = (result) => {
+    const makeAnAppointment = async (result) => {
         setTakeAppointment(result);
+        console.log(result)
+
+        try {
+            const response = await axios.get(
+                `/rendez-vous/${result}`,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    }
+                }
+            );
+
+            console.log(response.data);
+            let availableAppointment = [];
+            response.data.forEach(date => {
+                if (date.available) {
+                    availableAppointment.push(date)
+                }
+            })
+            setAppointmentOfSelectedDoctor(availableAppointment);
+        } catch (err) {
+            console.error('Erreur lors de la récupération des rendez-vous :', err);
+        }
     }
+
+    useEffect(() => {
+        let tab = [];
+        appointmentOfSelectedDoctor?.forEach(day => {
+            if (!tab.includes(day.dateOfAppointment)) {
+                console.log(day.dateOfAppointment)
+                tab.push(day.dateOfAppointment)
+            }
+        })
+        setAppointmentDay(tab)
+    }, [appointmentOfSelectedDoctor])
     // const [isLoading, setIsLoading] = useState(true);
+
+    function formatDate(inputDate) {
+        const date = new Date(inputDate);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const formattedDate = `${day}-${month}-${year}`;
+        return formattedDate;
+    }
+    function formatTime(inputTime) {
+        return inputTime.replace(/:\d{2}$/, '');
+    }
 
     console.log(user)
     // if (isLoading) {
@@ -34,7 +83,29 @@ const Home = () => {
                 (
                     takeAppointment ? (
                         <div className='home__makeappointment'>
-                            je prend un rendez-vous
+                            {appointmentOfSelectedDoctor ? (
+                                <div className='home__makeappointment-wrapper'>
+                                    <h2>Disponiblités du docteur</h2>
+
+                                    {appointmentDay.map(day => (
+
+                                        <div className='home__makeappointment-wrapper-date' key={day}>
+                                            <h3>{formatDate(day)}</h3>
+                                            {appointmentOfSelectedDoctor.map(appointment => (
+                                                <div className='home__makeappointment-container' key={appointment.id}>
+                                                    {day === appointment.dateOfAppointment ? (
+                                                        <div className='home__makeappointment-wrapper-item'>
+                                                            <div>Le {formatDate(appointment.dateOfAppointment)} de {formatTime(appointment.timeOfAppointment)} à {formatTime(appointment.endTimeOfAppointment)}</div>
+                                                            <div>réserver ce creneau</div>
+                                                        </div>
+                                                    ) : ""}
+                                                </div>
+                                            ))}
+
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : ""}
                         </div>
                     ) : (<div className='home__result'>
                         {searchResult.map((result, index) => (
@@ -46,7 +117,7 @@ const Home = () => {
                                     <div>{result.officePostalCode} {result.officeCity}</div>
                                     <div className='home__result-wrapper-btn'>
                                         <button
-                                            onClick={result => makeAnAppointment(result)}
+                                            onClick={() => makeAnAppointment(result.id)}
                                         >Prendre rendez-vous
                                         </button>
                                     </div>

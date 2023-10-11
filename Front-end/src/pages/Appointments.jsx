@@ -19,7 +19,6 @@ import 'moment/locale/fr';
 import { CgDanger } from "react-icons/cg";
 import { BsCheckLg } from "react-icons/bs";
 import { ImCross } from "react-icons/im";
-import DeleteButton from '../components/DeleteButton';
 
 const Appointments = () => {
     const user = useSelector((state) => state.userReducer.user);
@@ -413,20 +412,62 @@ const Appointments = () => {
     //     return <Loader />;
     // }
     const handleEventClick = (event) => {
-        Swal.fire({
-            title: 'Annuler le rendez-vous ?',
-            text: 'Voulez-vous vraiment annuler ce rendez-vous ?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Oui, annuler',
-            cancelButtonText: 'Non, conserver',
-            confirmButtonColor: '#d33',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                deleteAppointment(event)
-            }
-        });
+        const matchAppointment = appointments.find(appointment => appointment.id === event);
+
+        if (matchAppointment) {
+
+            Swal.fire({
+                title: `Annuler le rendez-vous du ${formatDate(matchAppointment.dateOfAppointment)} à ${matchAppointment.timeOfAppointment}?`,
+                text: 'Voulez-vous vraiment annuler ce rendez-vous ?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Oui, annuler',
+                cancelButtonText: 'Non, conserver',
+                confirmButtonColor: '#d33',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    deleteAppointment(event)
+                }
+            });
+        }
     }
+
+    function formatDate(inputDate) {
+        const date = new Date(inputDate);
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const formattedDate = `${day}-${month}-${year}`;
+        return formattedDate;
+    }
+
+    // const [viewsCalendar, setViewsCalendar] = useState({ month: false, week: true, day: false, agenda: false });
+    // const [defaultView, setDefaultView] = useState('week');
+    // useEffect(() => {
+    //     const updateViews = () => {
+    //         if (window.innerWidth >= 760) {
+    //             setDefaultView('week');
+    //         } else {
+    //             setDefaultView('day');
+    //         }
+    //     };
+    //     updateViews();
+    //     window.addEventListener('resize', updateViews);
+
+    //     return () => {
+    //         window.removeEventListener('resize', updateViews);
+    //     };
+    // }, [defaultView]);
+
+    // useEffect(() => {
+    //     // Ce useEffect réagira aux changements de defaultView
+    //     if (defaultView === 'week') {
+    //         setViewsCalendar({ month: false, week: true, day: false, agenda: false });
+    //     } else {
+    //         setViewsCalendar({ month: false, week: false, day: true, agenda: false });
+    //     }
+    // }, [defaultView]);
+
     const defaultView = 'week';
     const views = { month: false, week: true, day: false, agenda: false }
     return (
@@ -434,23 +475,24 @@ const Appointments = () => {
             <Navbar />
             <header className='appointments-header'>
                 <h1>Mes rendez-vous</h1>
-                {/* <div className='appointments-header__nav'>
-                    <div
-                        className={dateAppointment === "past" ? "appointments-header__nav-item item-active" : "appointments-header__nav-item"}
-                        onClick={() => setDateAppointment("past")}
-                    >Passés
-                    </div>
-                    <div
-                        className={dateAppointment === "today" ? "appointments-header__nav-item item-active" : "appointments-header__nav-item"}
-                        onClick={() => setDateAppointment("today")}
-                    >Aujourd'hui
-                    </div>
-                    <div
-                        className={dateAppointment === "future" ? "appointments-header__nav-item item-active" : "appointments-header__nav-item"}
-                        onClick={() => setDateAppointment("future")}
-                    >À venir
-                    </div>
-                </div> */}
+                {user?.role === "patient" ?
+                    (<div className='appointments-header__nav'>
+                        <div
+                            className={dateAppointment === "past" ? "appointments-header__nav-item item-active" : "appointments-header__nav-item"}
+                            onClick={() => setDateAppointment("past")}
+                        >Passés
+                        </div>
+                        <div
+                            className={dateAppointment === "today" ? "appointments-header__nav-item item-active" : "appointments-header__nav-item"}
+                            onClick={() => setDateAppointment("today")}
+                        >Aujourd'hui
+                        </div>
+                        <div
+                            className={dateAppointment === "future" ? "appointments-header__nav-item item-active" : "appointments-header__nav-item"}
+                            onClick={() => setDateAppointment("future")}
+                        >À venir
+                        </div>
+                    </div>) : ""}
             </header>
             <div className='appointments-main'>
                 {user?.role === "doctor" ? (
@@ -474,16 +516,8 @@ const Appointments = () => {
                     messages={customMessages}
                     formats={customFormats}
                     onSelectEvent={(event) => handleEventClick(event.id)}
-                // components={{
-                //     eventWrapper: ({ event }) => (
-                //         <div >
-
-                //             {event.start.getHours()} Supprimer
-                //         </div>
-                //     ),
-                // }}
                 />
-                {dateAppointment === "today" ? (
+                {(user?.role === "patient" && dateAppointment === "today") ? (
                     currentAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
                             {
@@ -508,7 +542,7 @@ const Appointments = () => {
                 ) : (
                     ""
                 )}
-                {dateAppointment === "future" ? (
+                {(user?.role === "patient" && dateAppointment === "future") ? (
                     futureAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
                             {futureAppointments.map((appointment) => (
@@ -532,7 +566,7 @@ const Appointments = () => {
                 ) : (
                     ""
                 )}
-                {dateAppointment === "past" ? (
+                {(user?.role === "patient" && dateAppointment === "past") ? (
                     pastAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
                             {pastAppointments.map((appointment) => (
