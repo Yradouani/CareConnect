@@ -1,4 +1,4 @@
-const initialState = { appointment: null };
+const initialState = { appointment: [] };
 
 export default function appointmentReducer(state = initialState, action) {
     switch (action.type) {

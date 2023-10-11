@@ -13,9 +13,10 @@ class AppointmentController extends Controller
     {
         try {
             $appointmentInfo = $request->validate([
-                "dateOfAppointment" => ["required"],
-                "timeOfAppointment" => ["required"],
-                "doctor_id" => ["required"]
+                "dateOfAppointment" => ["required", "date"],
+                "timeOfAppointment" => ["required", "date_format:H:i"],
+                "endTimeOfAppointment" => ["required", "date_format:H:i"],
+                "doctor_id" => ["required", "integer"]
             ]);
 
             $existingAppointment = Appointment::where('dateOfAppointment', $appointmentInfo['dateOfAppointment'])
@@ -30,6 +31,7 @@ class AppointmentController extends Controller
             $appointment = new Appointment([
                 'dateOfAppointment' => $appointmentInfo['dateOfAppointment'],
                 'timeOfAppointment' => $appointmentInfo['timeOfAppointment'],
+                'endTimeOfAppointment' => $appointmentInfo['endTimeOfAppointment'],
                 'doctor_id' => $appointmentInfo['doctor_id'],
                 'available' => true,
             ]);

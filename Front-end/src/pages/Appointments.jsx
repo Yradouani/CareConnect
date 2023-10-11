@@ -34,20 +34,24 @@ const Appointments = () => {
 
     moment.locale('fr');
     const localizer = momentLocalizer(moment);
-    const events = appointments.map((appointment, index) => {
+    const events = appointments?.map((appointment, index) => {
         const dateOfAppointment = new Date(appointment.dateOfAppointment);
         const timeOfAppointment = appointment.timeOfAppointment;
-
         const [hours, minutes] = timeOfAppointment.split(':');
         dateOfAppointment.setHours(hours);
         dateOfAppointment.setMinutes(minutes);
 
-        const endDate = new Date(dateOfAppointment.getTime() + 30 * 60000);
+        const endDateOfAppointment = new Date(appointment.dateOfAppointment)
+        const endTimeOfAppointment = appointment.endTimeOfAppointment;
+        const [endhours, endminutes] = endTimeOfAppointment.split(':');
+        endDateOfAppointment.setHours(endhours);
+        endDateOfAppointment.setMinutes(endminutes);
+
         return {
             id: appointment.id,
             title: "",
             start: dateOfAppointment,
-            end: endDate,
+            end: endDateOfAppointment,
         };
     });
 
@@ -108,6 +112,7 @@ const Appointments = () => {
     const [pastAppointments, setPastAppointments] = useState('');
     const [currentAppointments, setCurrentAppointments] = useState('');
     const [futureAppointments, setFutureAppointments] = useState('');
+    const [newAppointments, setNewAppointments] = useState('');
 
     const [dateOfAppointment, setDateOfAppointment] = useState('');
     const [validDateOfAppointment, setValidDateOfAppointment] = useState(false);
@@ -117,9 +122,17 @@ const Appointments = () => {
     const [validTimeOfAppointment, setValidTimeOfAppointment] = useState(false);
     const [timeOfAppointmentFocus, setTimeOfAppointmentFocus] = useState(false);
 
+    const [endTimeOfAppointment, setEndTimeOfAppointment] = useState('');
+    const [validEndTimeOfAppointment, setValidEndTimeOfAppointment] = useState(false);
+    const [endTimeOfAppointmentFocus, setEndTimeOfAppointmentFocus] = useState(false);
+
+    const [duration, setDuration] = useState('');
+    const [validDuration, setValidDuration] = useState(false);
+    const [durationFocus, setDurationFocus] = useState(false);
+
     const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
     const TIME_REGEX = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-
+    const NUMBER_REGEX = /^[0-9]{1,3}$/;
 
     useEffect(() => {
         const isDateOfAppointment = DATE_REGEX.test(dateOfAppointment);
@@ -134,6 +147,25 @@ const Appointments = () => {
         setValidTimeOfAppointment(isTimeOfAppointment && isNotPassed);
         //eslint-disable-next-line
     }, [dateOfAppointment, timeOfAppointment])
+
+    useEffect(() => {
+        const isEndTimeOfAppointment = TIME_REGEX.test(endTimeOfAppointment);
+        setValidEndTimeOfAppointment(isEndTimeOfAppointment);
+        //eslint-disable-next-line
+    }, [endTimeOfAppointment])
+
+    useEffect(() => {
+        console.log(newAppointments)
+        //eslint-disable-next-line
+    }, [newAppointments])
+
+    useEffect(() => {
+        const isDuration = NUMBER_REGEX.test(duration);
+        console.log(isDuration)
+        const isCheckDuration = checkDuration(dateOfAppointment, timeOfAppointment, endTimeOfAppointment, duration)
+        setValidDuration(isDuration && isCheckDuration);
+        //eslint-disable-next-line
+    }, [dateAppointment, timeOfAppointment, endTimeOfAppointment, duration])
 
     useEffect(() => {
         const pastAppointments = [];
@@ -202,6 +234,46 @@ const Appointments = () => {
         }
     }
 
+    const checkDuration = (dateAppointment, start, end, duration) => {
+        const startdate = new Date(dateAppointment)
+        const [starthours, startminutes] = start.split(':');
+        startdate.setHours(parseInt(starthours, 10));
+        startdate.setMinutes(parseInt(startminutes, 10));
+        const startMinutes = parseInt(starthours, 10) * 60 + parseInt(startminutes, 10);
+
+        const enddate = new Date(dateAppointment)
+        const [endhours, endminutes] = end.split(':');
+        enddate.setHours(parseInt(endhours, 10));
+        enddate.setMinutes(parseInt(endminutes, 10));
+        const endMinutes = parseInt(endhours, 10) * 60 + parseInt(endminutes, 10);
+
+        if (startdate >= enddate) {
+            return false;
+        }
+
+        const durationMin = parseInt(duration);
+
+        const newAppointmentsTab = [];
+
+        let currentStartTime = startdate;
+        if ((endMinutes - startMinutes) % durationMin === 0) {
+            while (currentStartTime < enddate) {
+                const currentEndTime = new Date(currentStartTime);
+                currentEndTime.setMinutes(currentEndTime.getMinutes() + durationMin);
+
+                newAppointmentsTab.push({
+                    startTime: currentStartTime,
+                    endTime: currentEndTime,
+                });
+
+                currentStartTime = currentEndTime;
+            }
+            setNewAppointments(newAppointmentsTab)
+        }
+
+        return (endMinutes - startMinutes) % durationMin === 0;
+    }
+
     const openModal = async () => {
         setOpenModal(true)
     }
@@ -252,52 +324,88 @@ const Appointments = () => {
 
     const handleAddAppointment = async (e) => {
         e.preventDefault();
-        try {
-            const response = await axios.post(
-                "/ajouter-un-rendez-vous",
-                JSON.stringify({
-                    dateOfAppointment,
-                    timeOfAppointment,
-                    doctor_id: userId
-                }),
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${user.token}`
-                    },
-                }
-            );
+
+        const promises = newAppointments.map(async (newAppointment) => {
+            console.log(newAppointment)
+
+            const starthours = newAppointment.startTime.getHours();
+            const startminutes = newAppointment.startTime.getMinutes();
+            const formattedStartTime = `${starthours.toString().padStart(2, '0')}:${startminutes.toString().padStart(2, '0')}`;
+
+            const endhours = newAppointment.endTime.getHours();
+            const endminutes = newAppointment.endTime.getMinutes();
+            const formattedEndTime = `${endhours.toString().padStart(2, '0')}:${endminutes.toString().padStart(2, '0')}`;
+
+            try {
+                const response = await axios.post(
+                    "/ajouter-un-rendez-vous",
+                    JSON.stringify({
+                        dateOfAppointment,
+                        timeOfAppointment: formattedStartTime,
+                        endTimeOfAppointment: formattedEndTime,
+                        doctor_id: userId
+                    }),
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${user.token}`
+                        },
+                    }
+                );
+                setOpenModal(false);
+                setDateOfAppointment('');
+                setTimeOfAppointment('');
+                setDateAppointment("today")
+                console.log(response.data)
+
+                // if (response.status === 200) {
+                //     Swal.fire({
+                //         icon: 'success',
+                //         title: 'Créneau ouvert avec succès',
+                //         showConfirmButton: false,
+                //         timer: 1500
+                //     });
+                // }
+                dispatch(addAppointment(response.data))
+                return true;
+            } catch (err) {
+                console.log(err);
+                return false
+                // if (err.response.status === 400) {
+                //     Swal.fire({
+                //         icon: 'error',
+                //         title: 'Ce créneau est déjà ouvert',
+                //         text: 'Veuillez choisir une autre date/heure',
+                //     });
+                // } else {
+                //     Swal.fire({
+                //         icon: 'error',
+                //         title: 'Erreur lors de l\'ajout du rendez-vous',
+                //         text: 'Veuillez réessayer.',
+                //     });
+                // }
+            }
+        })
+
+        const results = await Promise.all(promises);
+
+        if (results.every((result) => result === true)) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Tous les créneaux ont été ouverts avec succès',
+                showConfirmButton: false,
+                timer: 1500
+            });
             setOpenModal(false);
             setDateOfAppointment('');
             setTimeOfAppointment('');
-            setDateAppointment("today")
-            console.log(response.data)
-
-            if (response.status === 200) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Créneau ouvert avec succès',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            }
-            dispatch(addAppointment(response.data))
-        } catch (err) {
-            console.log(err);
-
-            if (err.response.status === 400) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Ce créneau est déjà ouvert',
-                    text: 'Veuillez choisir une autre date/heure',
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erreur lors de l\'ajout du rendez-vous',
-                    text: 'Veuillez réessayer.',
-                });
-            }
+            setDateAppointment("today");
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Au moins un des créneaux n\'a pas pu être ouvert',
+                text: 'Veuillez réessayer.'
+            });
         }
     }
 
@@ -480,7 +588,7 @@ const Appointments = () => {
                             <span className={validTimeOfAppointment || !timeOfAppointment ? "hide" : "invalid"}>
                                 <ImCross />
                             </span>
-                            Heure du rendez-vous* :</label>
+                            De* :</label>
                         <input
                             type="time"
                             name="appointment-time"
@@ -495,6 +603,55 @@ const Appointments = () => {
                         <div id="timenote" className={timeOfAppointmentFocus && timeOfAppointment && !validTimeOfAppointment ? "instructions" : "offscreen"}>
                             <CgDanger className='danger' />
                             Heure invalide (au moins une heure après l'heure actuelle)
+                        </div>
+
+                        <label htmlFor="endappointment-time">
+                            <span className={validEndTimeOfAppointment ? "valid" : "hide"}>
+                                <BsCheckLg />
+                            </span>
+                            <span className={validEndTimeOfAppointment || !endTimeOfAppointment ? "hide" : "invalid"}>
+                                <ImCross />
+                            </span>
+                            à* :</label>
+                        <input
+                            type="time"
+                            name="endappointment-time"
+                            id="endappointment-time"
+                            required
+                            aria-invalid={validEndTimeOfAppointment ? "false" : "true"}
+                            aria-describedby="endtimenote"
+                            onChange={(e) => setEndTimeOfAppointment(e.target.value)}
+                            onFocus={() => setEndTimeOfAppointmentFocus(true)}
+                            onBlur={() => setEndTimeOfAppointmentFocus(false)}
+                        />
+                        <div id="timenote" className={endTimeOfAppointmentFocus && endTimeOfAppointment && !validEndTimeOfAppointment ? "instructions" : "offscreen"}>
+                            <CgDanger className='danger' />
+                            Heure invalide (au moins une heure après l'heure actuelle)
+                        </div>
+
+                        <label htmlFor="duration">
+                            <span className={validDuration ? "valid" : "hide"}>
+                                <BsCheckLg />
+                            </span>
+                            <span className={validDuration || !duration ? "hide" : "invalid"}>
+                                <ImCross />
+                            </span>
+                            durée des rendez-vous en min* :</label>
+
+                        <input
+                            type="number"
+                            name="duration"
+                            id="duration"
+                            required
+                            aria-invalid={validDuration ? "false" : "true"}
+                            aria-describedby="durationnote"
+                            onChange={(e) => setDuration(e.target.value)}
+                            onFocus={() => setDurationFocus(true)}
+                            onBlur={() => setDurationFocus(false)}
+                        />
+                        <div id="durationnote" className={durationFocus && duration && !validDuration ? "instructions" : "offscreen"}>
+                            <CgDanger className='danger' />
+                            Durée des rendez-vous invalide
                         </div>
 
                         <input type="submit" value="Valider" />

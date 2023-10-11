@@ -53,7 +53,10 @@ const Login = () => {
                 const response = await axios.get(
                     `/rendez-vous/${userData.id}`,
                     {
-                        headers: { 'Content-Type': 'application/json' }
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${userData.token}`
+                        }
                     }
                 );
 
