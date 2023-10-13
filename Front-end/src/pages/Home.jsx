@@ -1,15 +1,21 @@
 import React from 'react';
-import { useEffect, useContext } from 'react';
-import Navbar from '../components/Navbar';
 import axios from '../api/axios';
 import { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
+import Swal from 'sweetalert2';
+
+//Components
 import Loader from '../components/Loader';
 import HomeHeader from '../components/Headers/HomeHeader';
-import { useSelector } from 'react-redux';
 import Footer from '../components/Footer';
+
+//Icons
+import { AiOutlineArrowLeft } from "react-icons/ai";
 
 const Home = () => {
     const user = useSelector((state) => state.userReducer.user);
+    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
     const [searchResult, setSearchResult] = useState(false);
     const [takeAppointment, setTakeAppointment] = useState(false);
@@ -52,13 +58,17 @@ const Home = () => {
         let tab = [];
         appointmentOfSelectedDoctor?.forEach(day => {
             if (!tab.includes(day.dateOfAppointment)) {
-                console.log(day.dateOfAppointment)
                 tab.push(day.dateOfAppointment)
             }
         })
         setAppointmentDay(tab)
     }, [appointmentOfSelectedDoctor])
     // const [isLoading, setIsLoading] = useState(true);
+
+    function getDay(date) {
+        const newdate = new Date(date);
+        return days[newdate.getDay()];
+    }
 
     function formatDate(inputDate) {
         const date = new Date(inputDate);
@@ -72,6 +82,66 @@ const Home = () => {
         return inputTime.replace(/:\d{2}$/, '');
     }
 
+    function bookAppointment(id, date, time) {
+        Swal.fire({
+            title: `Prendre rendez-vous le ${getDay(date)} ${formatDate(date)} à ${time}?`,
+            text: 'Voulez-vous vraiment prendre ce rendez-vous ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#75b6fe',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                confirmBookAppointment(id)
+            }
+        });
+    }
+
+    const confirmBookAppointment = async (appointmentid) => {
+        try {
+            const response = await axios.put(
+                `/rendez-vous/${appointmentid}`,
+                JSON.stringify({
+                    patient_id: user.id,
+                }),
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    }
+                }
+            );
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Créneau supprimer avec succès',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+            setTakeAppointment(false);
+            setSearchResult(false);
+        } catch (err) {
+            if (err.response.status === 400) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Le rendez-vous est déjà pris par un autre patient',
+                    text: 'Veuillez supprimer un autre créneau',
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur lors de la prise de rendez-vous.',
+                    text: 'Veuillez réessayer.',
+                });
+            }
+        }
+    }
+
+    function closeMakeAppointment() {
+        setTakeAppointment(false)
+    }
     console.log(user)
     // if (isLoading) {
     //     return <Loader />;
@@ -85,27 +155,48 @@ const Home = () => {
                         <div className='home__makeappointment'>
                             {appointmentOfSelectedDoctor ? (
                                 <div className='home__makeappointment-wrapper'>
-                                    <h2>Disponiblités du docteur</h2>
+                                    <div className='home__makeappointment-title-icon'>
+                                        <AiOutlineArrowLeft
+                                            onClick={() => closeMakeAppointment()}
+                                        />
+                                        <h2>Disponiblités du docteur</h2>
+                                    </div>
 
-                                    {appointmentDay.map(day => (
+                                    <div className='home__makeappointment-wrapper-column'>
+                                        {appointmentDay.filter(day => {
+                                            const appointmentDate = new Date(day);
+                                            const currentDate = new Date();
+                                            const isDateValid = appointmentDate >= currentDate;
+                                            return isDateValid
+                                        }).map(day => (
 
-                                        <div className='home__makeappointment-wrapper-date' key={day}>
-                                            <h3>{formatDate(day)}</h3>
-                                            {appointmentOfSelectedDoctor.map(appointment => (
-                                                <div className='home__makeappointment-container' key={appointment.id}>
-                                                    {day === appointment.dateOfAppointment ? (
-                                                        <div className='home__makeappointment-wrapper-item'>
-                                                            <div>Le {formatDate(appointment.dateOfAppointment)} de {formatTime(appointment.timeOfAppointment)} à {formatTime(appointment.endTimeOfAppointment)}</div>
-                                                            <div>réserver ce creneau</div>
+                                            <div className='home__makeappointment-wrapper-date' key={day}>
+                                                <h3>{getDay(day)} {formatDate(day)}</h3>
+                                                {appointmentOfSelectedDoctor
+                                                    .filter(appointment => {
+                                                        const isPatientNull = appointment.patient_id === null;
+                                                        const isDay = day === appointment.dateOfAppointment
+                                                        return isPatientNull && isDay
+
+                                                    })
+                                                    .map(appointment => (
+                                                        <div
+                                                            className='home__makeappointment-container'
+                                                            key={appointment.id}
+                                                            onClick={() => bookAppointment(appointment.id, appointment.dateOfAppointment, appointment.timeOfAppointment)}
+                                                        >
+                                                            <div className='home__makeappointment-wrapper-item'>
+                                                                <div>De {formatTime(appointment.timeOfAppointment)} à {formatTime(appointment.endTimeOfAppointment)}</div>
+                                                                <div>réserver ce créneau</div>
+                                                            </div>
                                                         </div>
-                                                    ) : ""}
-                                                </div>
-                                            ))}
-
-                                        </div>
-                                    ))}
+                                                    ))
+                                                }
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            ) : ""}
+                            ) : "Ce professionnel de santé n'a aucune disponibilité"}
                         </div>
                     ) : (<div className='home__result'>
                         {searchResult.map((result, index) => (
@@ -125,7 +216,7 @@ const Home = () => {
                                 <div className='home__result-wrapper-appointment'>
                                     {
                                         result.appointments ? (
-                                            <div>Prochain rendez-vous le {result.appointments.dateOfAppointment} à {result.appointments.timeOfAppointment}</div>
+                                            <div>Prochain rendez-vous le {getDay(result.appointments.dateOfAppointment)} {formatDate(result.appointments.dateOfAppointment)} à {formatTime(result.appointments.timeOfAppointment)}</div>
                                         ) : (
                                             <div>Aucun rendez-vous disponible avec ce praticien</div>
                                         )

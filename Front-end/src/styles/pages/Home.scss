@@ -171,14 +171,32 @@
         width: 100%;
         min-height: 800px;
 
+        @media (max-width: 650px) {
+            margin: 40px auto;
+        }
+
+        &-title-icon {
+            margin-top: 50px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            svg {
+                width: 30px;
+                height: 30px;
+                position: absolute;
+                left: 20px;
+                cursor: pointer;
+            }
+        }
+
         &-wrapper {
             display: flex;
             flex-direction: column;
+            padding: 20px;
 
             &-item {
-                background: aliceblue;
-                padding: 10px;
-                margin: 10px auto;
                 cursor: pointer;
                 width: 100%;
             }
@@ -187,22 +205,42 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
+                margin: 5px;
+                width: 30%;
 
-                h3{
+                h3 {
                     margin-top: 30px;
+                }
+
+                @media (max-width: 640px) {
+                    width: 45%;
+                }
+
+                @media (max-width: 440px) {
+                    width: 100%;
                 }
             }
 
             h2 {
                 text-align: center;
-                margin-top: 50px;
+                margin: 0;
+            }
+
+            &-column {
+                display: flex;
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: space-between;
             }
         }
 
         &-container {
             display: block ruby;
-            width: 250px;
+            width: 100%;
             text-align: center;
+            background: aliceblue;
+            margin: 7px 0;
+            padding: 10px;
         }
     }
 }

@@ -1,0 +1,33 @@
+.profil {
+    &-main {
+        width: 60%;
+        margin: 50px auto;
+
+        &__security {
+            display: flex;
+            height: 150px;
+            justify-content: space-between;
+            background: #f0f5f9;
+            padding: 20px;
+            border-radius: 10px;
+
+            div {
+                margin: auto 0;
+            }
+
+            img {
+                height: 100%;
+            }
+        }
+
+        svg {
+            fill: #75b6fe;
+            width: 20px;
+            height: 20px;
+        }
+
+        hr{
+            color: #f0f5f9;
+        }
+    }
+}

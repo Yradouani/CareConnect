@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Loader from '../components/Loader';
 import Footer from '../components/Footer';
-import { addAppointment, deleteAppointmentInStore } from '../actions/appointment.action';
+import { addAppointment, deleteAppointmentInStore, setAppointments } from '../actions/appointment.action';
 import Swal from 'sweetalert2';
 import { BsTrash } from "react-icons/bs";
 import { Calendar, momentLocalizer } from 'react-big-calendar';
@@ -22,6 +22,7 @@ import { ImCross } from "react-icons/im";
 
 const Appointments = () => {
     const user = useSelector((state) => state.userReducer.user);
+
     // const navigate = useNavigate();
     // useEffect(() => {
     //     if (!user) {
@@ -29,8 +30,32 @@ const Appointments = () => {
     //     }
     // }, [user, navigate]);
 
-    const appointments = useSelector((state) => state.appointmentReducer.appointment);
+    useEffect(() => {
+        const getAllAppointments = async () => {
+            try {
+                const response = await axios.get(
+                    `/rendez-vous/${user.id}`,
+                    {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${user.token}`
+                        }
+                    }
+                );
 
+                const tab = [];
+                Object.entries(response.data).forEach(item => {
+                    tab.push(item[1])
+                })
+                dispatch(setAppointments(tab));
+            } catch (err) {
+                console.error('Erreur lors de la récupération des rendez-vous :', err);
+            }
+        }
+        getAllAppointments();
+        // eslint-disable-next-line
+    }, []);
+    const appointments = useSelector((state) => state.appointmentReducer.appointment);
     moment.locale('fr');
     const localizer = momentLocalizer(moment);
     const events = appointments?.map((appointment, index) => {
@@ -46,29 +71,16 @@ const Appointments = () => {
         endDateOfAppointment.setHours(endhours);
         endDateOfAppointment.setMinutes(endminutes);
 
+        const checkDate = isDateTimeInPast(appointment.dateOfAppointment, appointment.timeOfAppointment)
+        const eventClassName = (appointment.patient_id === null && checkDate) ? 'available' : 'unavailable';
         return {
             id: appointment.id,
             title: "",
             start: dateOfAppointment,
             end: endDateOfAppointment,
+            className: eventClassName,
         };
     });
-
-    useEffect(() => {
-        const setEventColors = () => {
-            const cases = document.querySelectorAll(".rbc-event");
-
-            cases.forEach((element, index) => {
-                const appointment = appointments[index];
-                if (appointment && appointment.patient_id) {
-                    element.style.backgroundColor = "blue";
-                } else {
-                    element.style.backgroundColor = "green";
-                }
-            });
-        };
-        setEventColors();
-    }, [appointments]);
 
     const getValidRange = () => {
         const today = new Date();
@@ -197,9 +209,18 @@ const Appointments = () => {
                 uniqueDays.push(day);
             }
         });
-        console.log(uniqueDays)
         // eslint-disable-next-line
     }, [appointments]);
+
+    function isDateTimeInPast(dateString, timeString) {
+        const currentDateTime = new Date();
+        const dateToCheck = new Date(dateString);
+        const [hours, minutes] = timeString.split(':').map(Number);
+        dateToCheck.setHours(parseInt(hours, 10))
+        dateToCheck.setMinutes(parseInt(minutes, 10))
+
+        return dateToCheck > currentDateTime;
+    }
 
     const isNotYetPassed = (dateOfAppointment, timeOfAppointment = null) => {
         const appointmentDate = new Date(dateOfAppointment);
@@ -232,6 +253,7 @@ const Appointments = () => {
             return false;
         }
     }
+
 
     const checkDuration = (dateAppointment, start, end, duration) => {
         const startdate = new Date(dateAppointment)
@@ -356,33 +378,11 @@ const Appointments = () => {
                 setTimeOfAppointment('');
                 setDateAppointment("today")
                 console.log(response.data)
-
-                // if (response.status === 200) {
-                //     Swal.fire({
-                //         icon: 'success',
-                //         title: 'Créneau ouvert avec succès',
-                //         showConfirmButton: false,
-                //         timer: 1500
-                //     });
-                // }
                 dispatch(addAppointment(response.data))
                 return true;
             } catch (err) {
                 console.log(err);
                 return false
-                // if (err.response.status === 400) {
-                //     Swal.fire({
-                //         icon: 'error',
-                //         title: 'Ce créneau est déjà ouvert',
-                //         text: 'Veuillez choisir une autre date/heure',
-                //     });
-                // } else {
-                //     Swal.fire({
-                //         icon: 'error',
-                //         title: 'Erreur lors de l\'ajout du rendez-vous',
-                //         text: 'Veuillez réessayer.',
-                //     });
-                // }
             }
         })
 
@@ -503,6 +503,10 @@ const Appointments = () => {
                         <button>Ouvrir un nouveau créneau</button>
                     </div>
                 ) : ""}
+                <div className='appointments-main__exp'>
+                    <div className='appointments-main__exp-available'>Disponible</div>
+                    <div className='appointments-main__exp-unavailable'>Indisponible</div>
+                </div>
                 <Calendar
                     views={views}
                     defaultView={defaultView}
@@ -516,6 +520,9 @@ const Appointments = () => {
                     messages={customMessages}
                     formats={customFormats}
                     onSelectEvent={(event) => handleEventClick(event.id)}
+                    eventPropGetter={(event) => ({
+                        className: event.className,
+                    })}
                 />
                 {(user?.role === "patient" && dateAppointment === "today") ? (
                     currentAppointments.length > 0 ? (

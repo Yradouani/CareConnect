@@ -139,6 +139,9 @@ html {
     }
 
     table {
+        @media (max-width: 586px) {
+            width: 100%;
+        }
 
         input,
         select {

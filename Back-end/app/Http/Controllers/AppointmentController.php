@@ -69,4 +69,25 @@ class AppointmentController extends Controller
             return response()->json(['error' => 'Erreur lors de la suppression du rendez-vous.'], 500);
         }
     }
+
+    public function makeAppointment($id, Request $request)
+    {
+        try {
+            $appointment = Appointment::find($id);
+
+            if (!$appointment) {
+                return response()->json(['error' => 'Rendez-vous introuvable.'], 404);
+            }
+
+            if (is_null($appointment->patient_id)) {
+                $appointment->patient_id = $request->input('patient_id');
+                $appointment->save();
+                return response()->json(['message' => 'Rendez-vous réservé avec succès.'], 200);
+            } else {
+                return response()->json(['error' => 'Le rendez-vous est déjà pris par un autre patient'], 400);
+            }
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Erreur lors de la prise de rendez-vous.'], 500);
+        }
+    }
 }

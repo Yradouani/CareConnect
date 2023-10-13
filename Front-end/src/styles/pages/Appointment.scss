@@ -36,6 +36,21 @@
     &-main {
         margin-top: 50px;
 
+        .available {
+            background-color: #2fd52f;
+            color: #153b15;
+            border: 1px solid rgb(72, 100, 72);
+        }
+
+        .unavailable {
+            background-color: #3241A8;
+            color: white;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgb(16, 13, 91);
+        }
+
         .rbc-calendar {
             padding: 20px;
 
@@ -46,6 +61,15 @@
 
             .rbc-events-container {
                 margin-right: 0 !important;
+            }
+
+            .rbc-event {
+                display: flex !important;
+                justify-content: center !important;
+
+                &-label {
+                    margin: auto;
+                }
             }
         }
 
@@ -86,16 +110,28 @@
                 }
             }
 
-            .available {
-                background-color: greenyellow;
+        }
+
+        &__exp {
+            margin-left: 20px;
+
+            &-available,
+            &-unavailable {
+                height: 20px;
+                width: 100px;
+                border-radius: 5px;
+                margin-top: 10px;
+                text-align: center;
+                padding: 5px;
             }
 
-            .unavailable {
-                background-color: #3241A8;
-                color: white;
-                font-weight: bold;
-                display: flex;
-                flex-direction: column;
+            &-available {
+                background: #2fd52f;
+            }
+
+            &-unavailable {
+                background: #3241A8;
+                color: #FFFFFF;
             }
         }
     }
