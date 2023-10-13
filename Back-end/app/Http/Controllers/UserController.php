@@ -110,8 +110,28 @@ class UserController extends Controller
         return $user;
     }
 
-    public function updateInfoUser(Request $request, $id)
+    public function updateProfil(Request $request, $id)
     {
+        try {
+            $user = User::find($id);
+
+            if (!$user) {
+                return response()->json(['error' => 'Utilisateur introuvable.'], 404);
+            }
+
+            $key = $request->input('property');
+            $value = $request->input('value');
+
+            if ($key && $user->isFillable($key)) {
+                $user->$key = $value;
+                $user->save();
+                return response()->json(['message' => 'Profile modifié avec succès.'], 200);
+            } else {
+                return response()->json(['error' => 'Clé invalide ou non autorisée.'], 400);
+            }
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Erreur lors de la modification du profile'], 500);
+        }
     }
 
     public function getDoctorByNameSpecialityAndLocation(Request $request)

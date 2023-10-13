@@ -3,6 +3,12 @@ export const setUser = (userData) => ({
     payload: userData,
 });
 
+export const updateUserProperty = (key, value) => ({
+    type: 'UPDATE_USER_PROPERTY',
+    key,
+    value,
+});
+
 export const logout = () => ({
     type: 'LOGOUT',
 });

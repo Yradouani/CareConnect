@@ -12,6 +12,15 @@ export default function userReducer(state = initialState, action) {
                 ...state,
                 user: null,
             };
+        case 'UPDATE_USER_PROPERTY':
+            const updatedUser = {
+                ...state.user,
+                [action.key]: action.value,
+            };
+            return {
+                ...state,
+                user: updatedUser,
+            };
         default:
             return state;
     }

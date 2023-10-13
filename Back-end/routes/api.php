@@ -22,12 +22,15 @@ Route::post('/connexion', [UserController::class, "logIn"]);
 Route::post('/mon-compte', [UserController::class, "getUserById"]);
 Route::post('/recherche', [UserController::class, "getDoctorByNameSpecialityAndLocation"]);
 
-//Appointments
 Route::middleware(['auth:sanctum'])->group(function () {
+    //Appointments
     Route::post('/annuler-un-rendez-vous/{id}', [AppointmentController::class, "deleteAppointment"]);
     Route::post('/ajouter-un-rendez-vous', [AppointmentController::class, "addAppointment"]);
     Route::get('/rendez-vous/{id}', [AppointmentController::class, "getAllAppointmentsOfOneDoctor"]);
     Route::put('/rendez-vous/{id}', [AppointmentController::class, "makeAppointment"]);
+
+    //Users
+    Route::put('/profile/{id}', [UserController::class, "updateProfil"]);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
