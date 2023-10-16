@@ -208,15 +208,15 @@ const SignUp = (props) => {
         e.preventDefault();
 
         if (
-            validSocialSecurityNumber
-            && validFirstName
+            validFirstName
             && validLastName
             && validEmail
             && validPwd
             && validMatch
             && validRole
             && (role !== "doctor" || (validSpecialization && validOfficeAddress && validOfficePostalCode && validOfficeCity && validRPPSNumber))
-            && (role !== "patient" || (validDateOfBirth && validSocialSecurityNumber))) {
+            && (role !== "patient" || (validDateOfBirth && validSocialSecurityNumber))
+        ) {
             try {
                 const response = await axios.post(
                     SIGNIN_URL,

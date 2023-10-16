@@ -115,7 +115,7 @@ const Home = () => {
             if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Créneau supprimer avec succès',
+                    title: 'Le rendez-vous a été pris avec succès',
                     showConfirmButton: false,
                     timer: 1500
                 });

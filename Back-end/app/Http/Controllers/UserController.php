@@ -14,56 +14,60 @@ class UserController extends Controller
 {
     public function registration(Request $request)
     {
-        $userInfo = $request->validate([
-            "firstname" => ["required", "string", "min:2", "max:30"],
-            "lastname" => ["required", "string", "min:2", "max:30"],
-            "phone" => ["required", "string", "min:10", "max:13"],
-            "role" => ["required", "string", "in:patient,doctor"],
-            "email" => ["required", "email", "unique:users,email"],
-            "password" => ["required", "string", "min:8", "max:30"],
-            "confirm_password" => ["required", "same:password"]
-        ]);
-
-        $user = User::create([
-            "firstname" => $userInfo["firstname"],
-            "lastname" => $userInfo["lastname"],
-            "phone" => $userInfo["phone"],
-            "role" => $userInfo["role"],
-            "email" => $userInfo["email"],
-            "password" => bcrypt($userInfo["password"]),
-        ]);
-
-        if ($userInfo["role"] === "doctor") {
-            $doctorInfo = $request->validate([
-                "specialization" => ["required", "string"],
-                "officeAddress" => ["required", "string"],
-                "officePostalCode" => ["required", "string", "size:5"],
-                "officeCity" => ["required", "string", "min:2", "max:30"],
-                "RPPSNumber" => ["required", "string", "size:11"],
+        try {
+            $userInfo = $request->validate([
+                "firstname" => ["required", "string", "min:2", "max:30"],
+                "lastname" => ["required", "string", "min:2", "max:30"],
+                "phone" => ["required", "string", "min:10", "max:13"],
+                "role" => ["required", "string", "in:patient,doctor"],
+                "email" => ["required", "email", "unique:users,email"],
+                "password" => ["required", "string", "min:8", "max:30"],
+                "confirm_password" => ["required", "same:password"]
             ]);
 
-            $doctor = Doctor::create([
-                "user_id" => $user->id,
-                "specialization" => $doctorInfo["specialization"],
-                "officeAddress" => $doctorInfo["officeAddress"],
-                "officePostalCode" => $doctorInfo["officePostalCode"],
-                "officeCity" => $doctorInfo["officeCity"],
-                "RPPSNumber" => $doctorInfo["RPPSNumber"],
-            ]);
-        } else if ($userInfo["role"] === "patient") {
-            $patientInfo = $request->validate([
-                // "YYYY-MM-DD"
-                "dateOfBirth" => ["required", 'date'],
-                "socialSecurityNumber" => ["required", "string", "size:15"]
+            $user = User::create([
+                "firstname" => $userInfo["firstname"],
+                "lastname" => $userInfo["lastname"],
+                "phone" => $userInfo["phone"],
+                "role" => $userInfo["role"],
+                "email" => $userInfo["email"],
+                "password" => bcrypt($userInfo["password"]),
             ]);
 
-            $patient = Patient::create([
-                "user_id" => $user->id,
-                "dateOfBirth" => $patientInfo["dateOfBirth"],
-                "socialSecurityNumber" => $patientInfo["socialSecurityNumber"],
-            ]);
+            if ($userInfo["role"] === "doctor") {
+                $doctorInfo = $request->validate([
+                    "specialization" => ["required", "string"],
+                    "officeAddress" => ["required", "string"],
+                    "officePostalCode" => ["required", "string", "size:5"],
+                    "officeCity" => ["required", "string", "min:2", "max:30"],
+                    "RPPSNumber" => ["required", "string", "size:11"],
+                ]);
+
+                $doctor = Doctor::create([
+                    "user_id" => $user->id,
+                    "specialization" => $doctorInfo["specialization"],
+                    "officeAddress" => $doctorInfo["officeAddress"],
+                    "officePostalCode" => $doctorInfo["officePostalCode"],
+                    "officeCity" => $doctorInfo["officeCity"],
+                    "RPPSNumber" => $doctorInfo["RPPSNumber"],
+                ]);
+            } else if ($userInfo["role"] === "patient") {
+                $patientInfo = $request->validate([
+                    // "YYYY-MM-DD"
+                    "dateOfBirth" => ["required", 'date'],
+                    "socialSecurityNumber" => ["required", "string", "size:15"]
+                ]);
+
+                $patient = Patient::create([
+                    "user_id" => $user->id,
+                    "dateOfBirth" => $patientInfo["dateOfBirth"],
+                    "socialSecurityNumber" => $patientInfo["socialSecurityNumber"],
+                ]);
+            }
+            return response($patient, 201);
+        } catch (Exception $e) {
+            echo '</br> <b> Exception Message: ' . $e->getMessage() . '</b>';
         }
-        return response($patient, 201);
     }
 
     public function logIn(Request $request)
