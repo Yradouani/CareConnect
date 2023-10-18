@@ -23,6 +23,7 @@ const HomeHeader = ({ onSearchResult }) => {
                 }
             );
             setSearchResult(response.data)
+            console.log(response.data)
         } catch (err) {
             console.log(err);
         }

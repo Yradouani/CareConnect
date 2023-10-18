@@ -1,21 +1,23 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Profile from './pages/Profile';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Appointments from './pages/Appointments';
 import Connection from './pages/Connection';
 import Home from './pages/Home';
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const user = useSelector((state) => state.userReducer.user);
 
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
           <Route path='/' exact element={<Connection />} />
-          <Route path='/accueil' exact element={<Home />} />
-          <Route path='//profil' exact element={<Profile />} />
-          <Route path='/rendez-vous' exact element={<Appointments />} />
+          <Route path='/accueil' exact element={<Home user={user} />} />
+          <Route path='/profil' exact element={<Profile user={user} />} />
+          <Route path='/rendez-vous' exact element={<Appointments user={user} />} />
         </Routes>
       </BrowserRouter>
     </div>

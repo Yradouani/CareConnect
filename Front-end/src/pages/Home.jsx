@@ -13,8 +13,8 @@ import Footer from '../components/Footer';
 //Icons
 import { AiOutlineArrowLeft } from "react-icons/ai";
 
-const Home = () => {
-    const user = useSelector((state) => state.userReducer.user);
+const Home = ({ user }) => {
+    // const user = useSelector((state) => state.userReducer.user);
     const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
     const [searchResult, setSearchResult] = useState(false);
@@ -23,6 +23,7 @@ const Home = () => {
     const [appointmentDay, setAppointmentDay] = useState(null);
 
     const handleSearchResult = (result) => {
+        console.log(result)
         setSearchResult(result);
     };
 
@@ -129,6 +130,12 @@ const Home = () => {
                     title: 'Le rendez-vous est déjà pris par un autre patient',
                     text: 'Veuillez supprimer un autre créneau',
                 });
+            } else if (err.response.status === 401) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Vous ne pouvez pas prendre rendez-vous avec vous même',
+                    text: 'Veuillez choisir un autre professionnel de santé',
+                });
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -198,33 +205,40 @@ const Home = () => {
                                 </div>
                             ) : "Ce professionnel de santé n'a aucune disponibilité"}
                         </div>
-                    ) : (<div className='home__result'>
-                        {searchResult.map((result, index) => (
-                            <div className='home__result-wrapper' key={index}>
-                                <div className='home__result-wrapper-info'>
-                                    <div className='home__result-wrapper-name'>Dr {result.user.firstname} {result.user.lastname}</div>
-                                    <div className='home__result-wrapper-specialization'>{result.specialization}</div>
-                                    <div className='home__result-wrapper-address'>{result.officeAddress}</div>
-                                    <div>{result.officePostalCode} {result.officeCity}</div>
-                                    <div className='home__result-wrapper-btn'>
-                                        <button
-                                            onClick={() => makeAnAppointment(result.id)}
-                                        >Prendre rendez-vous
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className='home__result-wrapper-appointment'>
-                                    {
-                                        result.appointments ? (
-                                            <div>Prochain rendez-vous le {getDay(result.appointments.dateOfAppointment)} {formatDate(result.appointments.dateOfAppointment)} à {formatTime(result.appointments.timeOfAppointment)}</div>
-                                        ) : (
-                                            <div>Aucun rendez-vous disponible avec ce praticien</div>
-                                        )
-                                    }
-                                </div>
-                            </div>
-                        ))}
-                    </div>)
+                    ) : (
+                        <div className='home__result'>
+                            {searchResult.length > 0 ?
+                                (<div>
+
+                                    {searchResult.map((result, index) => (
+                                        <div className='home__result-wrapper' key={index}>
+                                            <div className='home__result-wrapper-info'>
+                                                <div className='home__result-wrapper-name'>Dr {result.user.firstname} {result.user.lastname}</div>
+                                                <div className='home__result-wrapper-specialization'>{result.specialization}</div>
+                                                <div className='home__result-wrapper-address'>{result.officeAddress}</div>
+                                                <div>{result.officePostalCode} {result.officeCity}</div>
+                                                <div className='home__result-wrapper-btn'>
+                                                    <button
+                                                        onClick={() => makeAnAppointment(result.user_id)}
+                                                    >Prendre rendez-vous
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className='home__result-wrapper-appointment'>
+                                                {
+                                                    result.appointments ? (
+                                                        <div>Prochain rendez-vous le {getDay(result.appointments.dateOfAppointment)} {formatDate(result.appointments.dateOfAppointment)} à {formatTime(result.appointments.timeOfAppointment)}</div>
+                                                    ) : (
+                                                        <div>Aucun rendez-vous disponible avec ce praticien</div>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>) : (
+                                    <div className='home__result-message'>"Aucun résultat ne correspond à votre recherche"</div>
+                                )}
+                        </div>)
                 ) : (
                     <div>
                         <div className='home__info-wrapper'>

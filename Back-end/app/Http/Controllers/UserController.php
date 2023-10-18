@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\User;
@@ -168,7 +169,7 @@ class UserController extends Controller
         foreach ($doctors as $doctor) {
             $doctorData = $doctor->toArray();
 
-            $appointment = $doctor->appointments()
+            $appointment = Appointment::where('doctor_id', $doctor->user_id)
                 ->where('dateOfAppointment', '>=', now())
                 ->orderBy('dateOfAppointment')
                 ->first();

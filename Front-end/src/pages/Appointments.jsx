@@ -19,9 +19,10 @@ import 'moment/locale/fr';
 import { CgDanger } from "react-icons/cg";
 import { BsCheckLg } from "react-icons/bs";
 import { ImCross } from "react-icons/im";
+import CardAppointment from '../components/CardAppointment';
 
-const Appointments = () => {
-    const user = useSelector((state) => state.userReducer.user);
+const Appointments = ({ user }) => {
+    // const user = useSelector((state) => state.userReducer.user);
 
     // const navigate = useNavigate();
     // useEffect(() => {
@@ -72,7 +73,9 @@ const Appointments = () => {
         endDateOfAppointment.setMinutes(endminutes);
 
         const checkDate = isDateTimeInPast(appointment.dateOfAppointment, appointment.timeOfAppointment)
-        const eventClassName = (appointment.patient_id === null && checkDate) ? 'available' : 'unavailable';
+        console.log(appointment.patient_id)
+        console.log(checkDate)
+        const eventClassName = (!appointment.patient_id && checkDate) ? 'available' : 'unavailable';
         return {
             id: appointment.id,
             title: "",
@@ -254,7 +257,7 @@ const Appointments = () => {
         }
     }
 
-
+    //Function to check if the duration of appointment is correct and cut slot into appointments
     const checkDuration = (dateAppointment, start, end, duration) => {
         const startdate = new Date(dateAppointment)
         const [starthours, startminutes] = start.split(':');
@@ -306,7 +309,9 @@ const Appointments = () => {
         try {
             const response = await axios.post(
                 `/annuler-un-rendez-vous/${id}`,
-                {},
+                JSON.stringify({
+                    role: user.role
+                }),
                 {
                     headers: {
                         'Content-Type': 'application/json',
@@ -364,7 +369,8 @@ const Appointments = () => {
                         dateOfAppointment,
                         timeOfAppointment: formattedStartTime,
                         endTimeOfAppointment: formattedEndTime,
-                        doctor_id: userId
+                        doctor_id: userId,
+                        role: user.role
                     }),
                     {
                         headers: {
@@ -496,54 +502,49 @@ const Appointments = () => {
             </header>
             <div className='appointments-main'>
                 {user?.role === "doctor" ? (
-                    <div
-                        className='appointments-main__button'
-                        onClick={() => openModal()}
-                    >
-                        <button>Ouvrir un nouveau créneau</button>
+                    <div>
+                        <div
+                            className='appointments-main__button'
+                            onClick={() => openModal()}
+                        >
+                            <button>Ouvrir un nouveau créneau</button>
+                        </div>
+                        <div className='appointments-main__exp'>
+                            <div className='appointments-main__exp-available'>Disponible</div>
+                            <div className='appointments-main__exp-unavailable'>Indisponible</div>
+                        </div>
+                        <Calendar
+                            views={views}
+                            defaultView={defaultView}
+                            localizer={localizer}
+                            events={events}
+                            startAccessor="start"
+                            endAccessor="end"
+                            style={{ height: 800 }}
+                            min={validRange[0]}
+                            max={validRange[1]}
+                            messages={customMessages}
+                            formats={customFormats}
+                            onSelectEvent={(event) => handleEventClick(event.id)}
+                            eventPropGetter={(event) => ({
+                                className: event.className,
+                            })}
+                        />
                     </div>
                 ) : ""}
-                <div className='appointments-main__exp'>
-                    <div className='appointments-main__exp-available'>Disponible</div>
-                    <div className='appointments-main__exp-unavailable'>Indisponible</div>
-                </div>
-                <Calendar
-                    views={views}
-                    defaultView={defaultView}
-                    localizer={localizer}
-                    events={events}
-                    startAccessor="start"
-                    endAccessor="end"
-                    style={{ height: 800 }}
-                    min={validRange[0]}
-                    max={validRange[1]}
-                    messages={customMessages}
-                    formats={customFormats}
-                    onSelectEvent={(event) => handleEventClick(event.id)}
-                    eventPropGetter={(event) => ({
-                        className: event.className,
-                    })}
-                />
                 {(user?.role === "patient" && dateAppointment === "today") ? (
                     currentAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
                             {
                                 currentAppointments.map((appointment) => (
-                                    <div key={appointment.id} className={`appointments-main__container-item ${appointment.available ? 'available' : 'unavailable'}`}>
-                                        <div >
-                                            <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
-                                            <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
-                                            <div>{appointment.available ? "disponible" : "réservé"}</div>
-                                        </div>
-                                        <BsTrash
-                                            onClick={() => deleteAppointment(appointment.id)}
-                                        />
-                                    </div>
+                                    <CardAppointment appointment={appointment} deleteAppointment={deleteAppointment} />
                                 ))}
                         </div>
                     ) : (
                         <div className='appointments-main__container'>
-                            Vous n'avez aucun rendez-vous aujourd'hui
+                            <div className='appointments-main__container-none'>
+                                Vous n'avez aucun rendez-vous aujourd'hui
+                            </div>
                         </div>
                     )
                 ) : (
@@ -553,21 +554,14 @@ const Appointments = () => {
                     futureAppointments.length > 0 ? (
                         <div className='appointments-main__container'>
                             {futureAppointments.map((appointment) => (
-                                <div key={appointment.id} className={`appointments-main__container-item ${appointment.available ? 'available' : 'unavailable'}`}>
-                                    <div >
-                                        <div className='appointments-main__container-date'>{appointment.dateOfAppointment}</div>
-                                        <div className='appointments-main__container-time'>{appointment.timeOfAppointment}</div>
-                                        <div>{appointment.available ? "disponible" : "réservé"}</div>
-                                    </div>
-                                    <BsTrash
-                                        onClick={() => deleteAppointment(appointment.id)}
-                                    />
-                                </div>
+                                <CardAppointment appointment={appointment} deleteAppointment={deleteAppointment} />
                             ))}
                         </div>
                     ) : (
                         <div className='appointments-main__container'>
-                            Vous n'avez aucun futurs rendez-vous
+                            <div className='appointments-main__container-none'>
+                                Vous n'avez aucun futurs rendez-vous
+                            </div>
                         </div>
                     )
                 ) : (
@@ -586,7 +580,9 @@ const Appointments = () => {
                         </div>
                     ) : (
                         <div className='appointments-main__container'>
-                            Vous n'avez aucun rendez-vous passés
+                            <div className='appointments-main__container-none'>
+                                Vous n'avez aucun rendez-vous passés
+                            </div>
                         </div>
                     )
                 ) : (

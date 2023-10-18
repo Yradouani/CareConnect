@@ -1,5 +1,6 @@
 .appointments {
     &-header {
+        background: #f9f9f9;
 
         h1 {
             margin: 0;
@@ -34,7 +35,9 @@
     }
 
     &-main {
-        margin-top: 50px;
+        padding-top: 50px;
+        background: #f9f9f9;
+        min-height: 500px;
 
         .available {
             background-color: #2fd52f;
@@ -71,6 +74,12 @@
                     margin: auto;
                 }
             }
+
+            .rbc-toolbar-label {
+                @media (max-width: 695px) {
+                    margin-top: 15px;
+                }
+            }
         }
 
         &__button {
@@ -94,22 +103,90 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin-bottom: 50px;
+            padding-bottom: 50px;
+
+
+            hr {
+                color: #2b466033;
+                width: 90%;
+                margin: 20px auto;
+            }
 
             &-item {
-                padding: 20px 40px;
                 margin-bottom: 7px;
-                width: 200px;
+                width: 50%;
                 text-align: center;
                 display: flex;
                 justify-content: space-around;
                 align-items: center;
+                background-color: white;
+                box-shadow: 1px 1px 1px rgb(202, 202, 202);
+                flex-direction: column;
+                border-radius: 10px;
 
                 svg {
                     cursor: pointer;
                 }
             }
 
+            &-appointment {
+                display: flex;
+                background-color: #75b6fe;
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+                padding: 10px 0;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+
+            &-date,
+            &-time {
+                display: flex;
+                align-items: center;
+                padding: 0 10px;
+                color: white;
+                font-weight: bold;
+
+                svg {
+                    margin-right: 5px;
+                }
+            }
+
+            &-none {
+                margin-top: 50px;
+            }
+
+            &-doctor {
+                width: 100%;
+                text-align: initial;
+                margin: 15px;
+            }
+
+            &-subtitle,
+            &-text {
+                padding-left: 50px;
+            }
+
+            &-subtitle {
+                color: #26466b;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+            }
+
+            &-delete {
+                margin-bottom: 30px;
+                color: red;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+
+                svg{
+                    margin-right: 5px;
+                }
+            }
         }
 
         &__exp {

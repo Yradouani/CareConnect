@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Swal from 'sweetalert2';
 import axios from '../api/axios';
@@ -12,9 +13,16 @@ import Footer from '../components/Footer';
 //Icons
 import { CgDanger } from "react-icons/cg";
 
-const Profile = () => {
-    const user = useSelector((state) => state.userReducer.user);
+const Profile = ({ user }) => {
+    // const user = useSelector((state) => state.userReducer.user);
     const dispatch = useDispatch();
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!user) {
+            navigate('/');
+        }
+    }, [user, navigate]);
     const changeProfil = async (propertyTochange, string1) => {
 
         let REGEX;

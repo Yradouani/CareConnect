@@ -26,7 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Appointments
     Route::post('/annuler-un-rendez-vous/{id}', [AppointmentController::class, "deleteAppointment"]);
     Route::post('/ajouter-un-rendez-vous', [AppointmentController::class, "addAppointment"]);
-    Route::get('/rendez-vous/{id}', [AppointmentController::class, "getAllAppointmentsOfOneDoctor"]);
+    Route::get('/rendez-vous/{id}', [AppointmentController::class, "getAllAppointmentsOfOneUser"]);
     Route::put('/rendez-vous/{id}', [AppointmentController::class, "makeAppointment"]);
 
     //Users
