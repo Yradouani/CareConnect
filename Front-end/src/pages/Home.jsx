@@ -21,6 +21,8 @@ const Home = ({ user }) => {
     const [takeAppointment, setTakeAppointment] = useState(false);
     const [appointmentOfSelectedDoctor, setAppointmentOfSelectedDoctor] = useState(null);
     const [appointmentDay, setAppointmentDay] = useState(null);
+    const [loading, setLoading] = useState(true);
+
 
     const handleSearchResult = (result) => {
         console.log(result)
@@ -50,6 +52,7 @@ const Home = ({ user }) => {
                 }
             })
             setAppointmentOfSelectedDoctor(availableAppointment);
+            setLoading(false)
         } catch (err) {
             console.error('Erreur lors de la récupération des rendez-vous :', err);
         }
@@ -63,6 +66,7 @@ const Home = ({ user }) => {
             }
         })
         setAppointmentDay(tab)
+
     }, [appointmentOfSelectedDoctor])
     // const [isLoading, setIsLoading] = useState(true);
 
@@ -104,6 +108,7 @@ const Home = ({ user }) => {
             const response = await axios.put(
                 `/rendez-vous/${appointmentid}`,
                 JSON.stringify({
+                    role: user.role,
                     patient_id: user.id,
                 }),
                 {
@@ -133,8 +138,8 @@ const Home = ({ user }) => {
             } else if (err.response.status === 401) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Vous ne pouvez pas prendre rendez-vous avec vous même',
-                    text: 'Veuillez choisir un autre professionnel de santé',
+                    title: 'Vous ne pouvez pas prendre rendez-vous avec un compte professionnel',
+                    text: 'Veuillez créer un compte patient',
                 });
             } else {
                 Swal.fire({
@@ -158,9 +163,9 @@ const Home = ({ user }) => {
             <HomeHeader onSearchResult={handleSearchResult} />
             {searchResult ?
                 (
-                    takeAppointment ? (
+                    takeAppointment && !loading ? (
                         <div className='home__makeappointment'>
-                            {appointmentOfSelectedDoctor ? (
+                            {appointmentOfSelectedDoctor && appointmentOfSelectedDoctor.length > 0 ? (
                                 <div className='home__makeappointment-wrapper'>
                                     <div className='home__makeappointment-title-icon'>
                                         <AiOutlineArrowLeft

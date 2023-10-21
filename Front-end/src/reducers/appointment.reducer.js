@@ -3,7 +3,6 @@ const initialState = { appointment: [] };
 export default function appointmentReducer(state = initialState, action) {
     switch (action.type) {
         case 'SET_APPOINTMENTS':
-            console.log("je set appointments reducer")
             return {
                 ...state,
                 appointment: action.payload,

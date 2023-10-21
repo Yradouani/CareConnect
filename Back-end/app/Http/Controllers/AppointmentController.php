@@ -20,14 +20,24 @@ class AppointmentController extends Controller
                 "role" => ["required", "string", "in:patient,doctor"]
             ]);
 
+            // check if there is already an appointment
             if ($appointmentInfo["role"] === "doctor") {
-                $existingAppointment = Appointment::where('dateOfAppointment', $appointmentInfo['dateOfAppointment'])
-                    ->where('timeOfAppointment', $appointmentInfo['timeOfAppointment'])
+                $existingAppointments = Appointment::where('dateOfAppointment', $appointmentInfo['dateOfAppointment'])
                     ->where('doctor_id', $appointmentInfo['doctor_id'])
-                    ->first();
+                    ->get();
 
-                if ($existingAppointment) {
-                    return response()->json(['error' => 'Ce rendez-vous est déjà pris.'], 400);
+                foreach ($existingAppointments as $existingAppointment) {
+                    $date1 = strtotime($appointmentInfo['dateOfAppointment']);
+                    $date2 = strtotime($existingAppointment->dateOfAppointment);
+
+                    $start1 = strtotime($appointmentInfo['timeOfAppointment']);
+                    $end1 = strtotime($appointmentInfo['endTimeOfAppointment']);
+                    $start2 = strtotime($existingAppointment->timeOfAppointment);
+                    $end2 = strtotime($existingAppointment->endTimeOfAppointment);
+
+                    if ($date1 == $date2 && $start1 < $end2 && $end1 > $start2) {
+                        return response()->json(['error' => 'Les horaires de rendez-vous se chevauchent.'], 400);
+                    }
                 }
 
                 $appointment = new Appointment([
@@ -102,8 +112,8 @@ class AppointmentController extends Controller
                 return response()->json(['error' => 'Rendez-vous introuvable.'], 404);
             }
 
-            if ($appointment->doctor_id === $request->input('patient_id')) {
-                return response()->json(['error' => 'Vous ne pouvez pas prendre rendez-vous avec vous même'], 401);
+            if ($request->role === "doctor") {
+                return response()->json(['error' => 'Vous ne pouvez pas prendre rendez-vous avec un compte professionnel'], 401);
             }
 
             if (is_null($appointment->patient_id)) {

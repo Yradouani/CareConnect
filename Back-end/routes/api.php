@@ -17,12 +17,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 //Users
+Route::middleware(['throttle:login'])->group(function () {
+    Route::post('/connexion', [UserController::class, 'logIn']);
+});
+
 Route::post('/inscription', [UserController::class, "registration"]);
-Route::post('/connexion', [UserController::class, "logIn"]);
 Route::post('/mon-compte', [UserController::class, "getUserById"]);
 Route::post('/recherche', [UserController::class, "getDoctorByNameSpecialityAndLocation"]);
 
-Route::middleware(['auth:sanctum'])->group(function () {
+
+Route::middleware(['jwt.auth'])->group(function () {
     //Appointments
     Route::post('/annuler-un-rendez-vous/{id}', [AppointmentController::class, "deleteAppointment"]);
     Route::post('/ajouter-un-rendez-vous', [AppointmentController::class, "addAppointment"]);
@@ -31,8 +35,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Users
     Route::put('/profile/{id}', [UserController::class, "updateProfil"]);
-});
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
 });

@@ -1,37 +1,25 @@
 import React from 'react';
 import Navbar from '../components/Navbar';
 import axios from '../api/axios';
-import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Loader from '../components/Loader';
 import Footer from '../components/Footer';
 import { addAppointment, deleteAppointmentInStore, setAppointments } from '../actions/appointment.action';
 import Swal from 'sweetalert2';
-import { BsTrash } from "react-icons/bs";
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import 'moment/locale/fr';
 
-
-//Icons
-import { CgDanger } from "react-icons/cg";
-import { BsCheckLg } from "react-icons/bs";
-import { ImCross } from "react-icons/im";
+//Components
 import CardAppointment from '../components/CardAppointment';
+import FormAddAppointment from '../components/FormAddAppointment';
 
 const Appointments = ({ user }) => {
-    // const user = useSelector((state) => state.userReducer.user);
-
-    // const navigate = useNavigate();
-    // useEffect(() => {
-    //     if (!user) {
-    //         navigate('/');
-    //     }
-    // }, [user, navigate]);
 
     useEffect(() => {
+        //Request to retrieve all appointments for the logged-in user
         const getAllAppointments = async () => {
             try {
                 const response = await axios.get(
@@ -48,6 +36,7 @@ const Appointments = ({ user }) => {
                 Object.entries(response.data).forEach(item => {
                     tab.push(item[1])
                 })
+                //Setup appointments in redux store
                 dispatch(setAppointments(tab));
             } catch (err) {
                 console.error('Erreur lors de la récupération des rendez-vous :', err);
@@ -56,35 +45,40 @@ const Appointments = ({ user }) => {
         getAllAppointments();
         // eslint-disable-next-line
     }, []);
+
+    //Get all appointments of redux store
     const appointments = useSelector((state) => state.appointmentReducer.appointment);
     moment.locale('fr');
     const localizer = momentLocalizer(moment);
+
+    //Function to add appointments into calender
     const events = appointments?.map((appointment, index) => {
-        const dateOfAppointment = new Date(appointment.dateOfAppointment);
-        const timeOfAppointment = appointment.timeOfAppointment;
-        const [hours, minutes] = timeOfAppointment.split(':');
-        dateOfAppointment.setHours(hours);
-        dateOfAppointment.setMinutes(minutes);
+        if (appointment.dateOfAppointment) {
+            const dateOfAppointment = new Date(appointment.dateOfAppointment);
+            const timeOfAppointment = appointment.timeOfAppointment;
+            const [hours, minutes] = timeOfAppointment.split(':');
+            dateOfAppointment.setHours(hours);
+            dateOfAppointment.setMinutes(minutes);
 
-        const endDateOfAppointment = new Date(appointment.dateOfAppointment)
-        const endTimeOfAppointment = appointment.endTimeOfAppointment;
-        const [endhours, endminutes] = endTimeOfAppointment.split(':');
-        endDateOfAppointment.setHours(endhours);
-        endDateOfAppointment.setMinutes(endminutes);
+            const endDateOfAppointment = new Date(appointment.dateOfAppointment)
+            const endTimeOfAppointment = appointment.endTimeOfAppointment;
+            const [endhours, endminutes] = endTimeOfAppointment.split(':');
+            endDateOfAppointment.setHours(endhours);
+            endDateOfAppointment.setMinutes(endminutes);
 
-        const checkDate = isDateTimeInPast(appointment.dateOfAppointment, appointment.timeOfAppointment)
-        console.log(appointment.patient_id)
-        console.log(checkDate)
-        const eventClassName = (!appointment.patient_id && checkDate) ? 'available' : 'unavailable';
-        return {
-            id: appointment.id,
-            title: "",
-            start: dateOfAppointment,
-            end: endDateOfAppointment,
-            className: eventClassName,
-        };
+            const checkDate = isDateTimeInPast(appointment.dateOfAppointment, appointment.timeOfAppointment)
+            const eventClassName = (!appointment.patient_id && checkDate) ? 'available' : 'unavailable';
+            return {
+                id: appointment.id,
+                title: "",
+                start: dateOfAppointment,
+                end: endDateOfAppointment,
+                className: eventClassName,
+            };
+        }
     });
 
+    //Set the time slots to display on calendar
     const getValidRange = () => {
         const today = new Date();
         const startHour = 8;
@@ -95,6 +89,7 @@ const Appointments = ({ user }) => {
         return [validStart, validEnd];
     };
 
+    //Set custom messages to display on calendar
     const customMessages = {
         today: "Aujourd'hui",
         next: "Semaine suivante",
@@ -106,6 +101,7 @@ const Appointments = ({ user }) => {
         event: "Événement",
     };
 
+    //Custom date format to display on calendar
     const customFormats = {
         dayFormat: (date, culture, localizer) =>
             localizer.format(date, 'dddd', culture),
@@ -130,19 +126,15 @@ const Appointments = ({ user }) => {
 
     const [dateOfAppointment, setDateOfAppointment] = useState('');
     const [validDateOfAppointment, setValidDateOfAppointment] = useState(false);
-    const [dateOfAppointmentFocus, setDateOfAppointmentFocus] = useState(false);
 
     const [timeOfAppointment, setTimeOfAppointment] = useState('');
     const [validTimeOfAppointment, setValidTimeOfAppointment] = useState(false);
-    const [timeOfAppointmentFocus, setTimeOfAppointmentFocus] = useState(false);
 
     const [endTimeOfAppointment, setEndTimeOfAppointment] = useState('');
     const [validEndTimeOfAppointment, setValidEndTimeOfAppointment] = useState(false);
-    const [endTimeOfAppointmentFocus, setEndTimeOfAppointmentFocus] = useState(false);
 
     const [duration, setDuration] = useState('');
     const [validDuration, setValidDuration] = useState(false);
-    const [durationFocus, setDurationFocus] = useState(false);
 
     const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
     const TIME_REGEX = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -164,14 +156,10 @@ const Appointments = ({ user }) => {
 
     useEffect(() => {
         const isEndTimeOfAppointment = TIME_REGEX.test(endTimeOfAppointment);
-        setValidEndTimeOfAppointment(isEndTimeOfAppointment);
+        const isEndTimeAfterStartTime = isEndAfterStart(dateOfAppointment, timeOfAppointment, endTimeOfAppointment);
+        setValidEndTimeOfAppointment(isEndTimeOfAppointment && isEndTimeAfterStartTime);
         //eslint-disable-next-line
     }, [endTimeOfAppointment])
-
-    useEffect(() => {
-        console.log(newAppointments)
-        //eslint-disable-next-line
-    }, [newAppointments])
 
     useEffect(() => {
         const isDuration = NUMBER_REGEX.test(duration);
@@ -223,6 +211,20 @@ const Appointments = ({ user }) => {
         dateToCheck.setMinutes(parseInt(minutes, 10))
 
         return dateToCheck > currentDateTime;
+    }
+
+    const isEndAfterStart = (dateOfAppointment, timeOfAppointment, endTimeOfAppointment) => {
+        let start = new Date(dateOfAppointment)
+        let end = new Date(dateOfAppointment)
+
+        const [starthours, startminutes] = timeOfAppointment.split(':');
+        const [endhours, endminutes] = endTimeOfAppointment.split(':');
+        start.setHours(starthours);
+        start.setMinutes(startminutes);
+        end.setHours(endhours);
+        end.setMinutes(endminutes);
+
+        return end > start;
     }
 
     const isNotYetPassed = (dateOfAppointment, timeOfAppointment = null) => {
@@ -404,13 +406,17 @@ const Appointments = ({ user }) => {
             setOpenModal(false);
             setDateOfAppointment('');
             setTimeOfAppointment('');
-            setDateAppointment("today");
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Au moins un des créneaux n\'a pas pu être ouvert',
-                text: 'Veuillez réessayer.'
+                title: 'Au moins un des rendez-vous n\'a pas pu être ouvert',
+                text: 'Attention, vos créneaux horaires ne peuvent pas se chevaucher'
             });
+            setOpenModal(false);
+            setDateOfAppointment('');
+            setTimeOfAppointment('');
+            setEndTimeOfAppointment('');
+            setDuration('');
         }
     }
 
@@ -592,110 +598,21 @@ const Appointments = ({ user }) => {
             {modal ? (
                 <div className='appointments__modal'>
                     <h2>Ouvrir un créneau</h2>
-                    <form onSubmit={e => handleAddAppointment(e)}>
-                        <label htmlFor="appointment-date">
-                            <span className={validDateOfAppointment ? "valid" : "hide"}>
-                                <BsCheckLg />
-                            </span>
-                            <span className={validDateOfAppointment || !dateOfAppointment ? "hide" : "invalid"}>
-                                <ImCross />
-                            </span>
-                            Date du rendez-vous* :
-                        </label>
-                        <input
-                            type="date"
-                            name="appointment-date"
-                            required
-                            id="appointment-date"
-                            aria-invalid={validDateOfAppointment ? "false" : "true"}
-                            aria-describedby="datenote"
-                            onChange={(e) => setDateOfAppointment(e.target.value)}
-                            onFocus={() => setDateOfAppointmentFocus(true)}
-                            onBlur={() => setDateOfAppointmentFocus(false)}
-                        />
-                        <div id="datenote" className={dateOfAppointmentFocus && dateOfAppointment && !validDateOfAppointment ? "instructions" : "offscreen"}>
-                            <CgDanger className='danger' />
-                            Date invalide (ne peut pas être antérieure à la date actuelle)
-                        </div>
-
-                        <label htmlFor="appointment-time">
-                            <span className={validTimeOfAppointment ? "valid" : "hide"}>
-                                <BsCheckLg />
-                            </span>
-                            <span className={validTimeOfAppointment || !timeOfAppointment ? "hide" : "invalid"}>
-                                <ImCross />
-                            </span>
-                            De* :</label>
-                        <input
-                            type="time"
-                            name="appointment-time"
-                            id="appointment-time"
-                            required
-                            aria-invalid={validTimeOfAppointment ? "false" : "true"}
-                            aria-describedby="timenote"
-                            onChange={(e) => setTimeOfAppointment(e.target.value)}
-                            onFocus={() => setTimeOfAppointmentFocus(true)}
-                            onBlur={() => setTimeOfAppointmentFocus(false)}
-                        />
-                        <div id="timenote" className={timeOfAppointmentFocus && timeOfAppointment && !validTimeOfAppointment ? "instructions" : "offscreen"}>
-                            <CgDanger className='danger' />
-                            Heure invalide (au moins une heure après l'heure actuelle)
-                        </div>
-
-                        <label htmlFor="endappointment-time">
-                            <span className={validEndTimeOfAppointment ? "valid" : "hide"}>
-                                <BsCheckLg />
-                            </span>
-                            <span className={validEndTimeOfAppointment || !endTimeOfAppointment ? "hide" : "invalid"}>
-                                <ImCross />
-                            </span>
-                            à* :</label>
-                        <input
-                            type="time"
-                            name="endappointment-time"
-                            id="endappointment-time"
-                            required
-                            aria-invalid={validEndTimeOfAppointment ? "false" : "true"}
-                            aria-describedby="endtimenote"
-                            onChange={(e) => setEndTimeOfAppointment(e.target.value)}
-                            onFocus={() => setEndTimeOfAppointmentFocus(true)}
-                            onBlur={() => setEndTimeOfAppointmentFocus(false)}
-                        />
-                        <div id="timenote" className={endTimeOfAppointmentFocus && endTimeOfAppointment && !validEndTimeOfAppointment ? "instructions" : "offscreen"}>
-                            <CgDanger className='danger' />
-                            Heure invalide (au moins une heure après l'heure actuelle)
-                        </div>
-
-                        <label htmlFor="duration">
-                            <span className={validDuration ? "valid" : "hide"}>
-                                <BsCheckLg />
-                            </span>
-                            <span className={validDuration || !duration ? "hide" : "invalid"}>
-                                <ImCross />
-                            </span>
-                            durée des rendez-vous en min* :</label>
-
-                        <input
-                            type="number"
-                            name="duration"
-                            id="duration"
-                            required
-                            aria-invalid={validDuration ? "false" : "true"}
-                            aria-describedby="durationnote"
-                            onChange={(e) => setDuration(e.target.value)}
-                            onFocus={() => setDurationFocus(true)}
-                            onBlur={() => setDurationFocus(false)}
-                        />
-                        <div id="durationnote" className={durationFocus && duration && !validDuration ? "instructions" : "offscreen"}>
-                            <CgDanger className='danger' />
-                            Durée des rendez-vous invalide
-                        </div>
-
-                        <input type="submit" value="Valider" />
-                        <button
-                            onClick={() => closeModal()}
-                        >Annuler</button>
-                    </form>
+                    <FormAddAppointment
+                        handleAddAppointment={handleAddAppointment}
+                        validDateOfAppointment={validDateOfAppointment}
+                        dateOfAppointment={dateOfAppointment}
+                        setDateOfAppointment={setDateOfAppointment}
+                        validTimeOfAppointment={validTimeOfAppointment}
+                        timeOfAppointment={timeOfAppointment}
+                        setTimeOfAppointment={setTimeOfAppointment}
+                        validEndTimeOfAppointment={validEndTimeOfAppointment}
+                        endTimeOfAppointment={endTimeOfAppointment}
+                        setEndTimeOfAppointment={setEndTimeOfAppointment}
+                        validDuration={validDuration}
+                        duration={duration}
+                        setDuration={setDuration}
+                        closeModal={closeModal} />
                 </div>
             ) : ""}
             <Footer />

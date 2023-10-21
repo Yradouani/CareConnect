@@ -10,6 +10,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\JWT as JWTAuthJWT;
 
 class UserController extends Controller
 {
@@ -75,15 +77,25 @@ class UserController extends Controller
     {
         $userInfo = $request->validate([
             "email" => ["required", "email"],
-            "password" => ["required", "string", "min:8", "max:30"],
+            "password" => ["required", "string"],
         ]);
 
         $user = User::where("email", $userInfo["email"])->first();
         if (!$user) return response(["message" => "Aucun utilisateur de trouver avec l'email suivant $userInfo[email]"], 401);
         if (!Hash::check($userInfo["password"], $user->password)) return response(["message" => "Aucun utilisateur de trouver avec ce mot de passe"], 401);
-        $token = $user->createToken('SECRET_KEY')->plainTextToken;
+
+        $customClaims = [
+            'id' => $user->id,
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname,
+            'phone' => $user->phone,
+            'email' => $user->email,
+            'role' => $user->role,
+            'issued_at' => now()->timestamp,
+        ];
+        $token = JWTAuth::claims($customClaims)->fromUser($user);
+
         return response([
-            "user" => $user,
             "token" => $token
         ], 200);
     }

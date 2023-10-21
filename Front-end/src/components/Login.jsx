@@ -5,6 +5,7 @@ import { setUser } from '../actions/user.action';
 import { setAppointments } from '../actions/appointment.action';
 import axios from '../api/axios';
 import { useNavigate } from 'react-router-dom'
+import jwt_decode from "jwt-decode";
 
 const Login = () => {
     const emailRef = useRef();
@@ -38,14 +39,17 @@ const Login = () => {
                     // withCredentials: true
                 }
             );
+
+            const decodedToken = jwt_decode(response?.data?.token);
             const userData = {
-                id: response?.data?.user.id,
+                id: decodedToken.id,
                 token: response?.data?.token,
-                firstname: response?.data?.user.firstname,
-                lastname: response?.data?.user.lastname,
-                phone: response?.data?.user.phone,
-                email: response?.data?.user.email,
-                role: response?.data?.user.role,
+                firstname: decodedToken.firstname,
+                lastname: decodedToken.lastname,
+                phone: decodedToken.phone,
+                email: decodedToken.email,
+                role: decodedToken.role,
+                issued_at: decodedToken.issued_at
             };
             dispatch(setUser(userData));
 
@@ -78,6 +82,8 @@ const Login = () => {
                 setErrMsg("Veuillez entrer votre email ET votre mot de passe");
             } else if (err.response?.status === 401) {
                 setErrMsg("Email et/ou mot de passe incorrect");
+            } else if (err.response?.status === 429) {
+                setErrMsg("Trop de tentatives de connexion, veuillez réessayer plus tard");
             } else {
                 setErrMsg('Connexion échouée')
             }
