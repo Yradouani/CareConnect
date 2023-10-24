@@ -1,10 +1,9 @@
 import React from 'react';
-import Navbar from '../components/Navbar';
 import axios from '../api/axios';
 import { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Helmet } from 'react-helmet';
 import Loader from '../components/Loader';
-import Footer from '../components/Footer';
 import { addAppointment, deleteAppointmentInStore, setAppointments } from '../actions/appointment.action';
 import Swal from 'sweetalert2';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
@@ -13,6 +12,8 @@ import moment from 'moment';
 import 'moment/locale/fr';
 
 //Components
+import Footer from '../components/Footer';
+import Navbar from '../components/Navbar';
 import CardAppointment from '../components/CardAppointment';
 import FormAddAppointment from '../components/FormAddAppointment';
 
@@ -493,6 +494,10 @@ const Appointments = ({ user }) => {
     const views = { month: false, week: true, day: false, agenda: false }
     return (
         <div className='appointments'>
+            <Helmet>
+                <title>CareConnect - Mes rendez-vous</title>
+                <meta name="description" content="Consulter vos rendez-vous en ligne" />
+            </Helmet>
             <Navbar />
             <header className='appointments-header'>
                 <h1>Mes rendez-vous</h1>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import { Helmet } from 'react-helmet';
 import Login from '../components/Login';
 import SignUp from '../components/SignUp';
 import { AiOutlineCopyrightCircle } from "react-icons/ai";
@@ -11,6 +12,10 @@ const Connection = () => {
 
     return (
         <div className='connection'>
+            <Helmet>
+                <title>CareConnect - Page de connexion</title>
+                <meta name="description" content="Connectez-vous à CareConnect pour prendre vos rendez-vous médicaux en ligne facilement et rapidement" />
+            </Helmet>
             <div className='primary-part'>
                 <div className='logo-container'>
                     <img src="logo.png" alt="logo" className='logo' />

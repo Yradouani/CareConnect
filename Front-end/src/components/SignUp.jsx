@@ -353,14 +353,14 @@ const SignUp = (props) => {
                                         ref={registerPhone}
                                         autoComplete='off'
                                         aria-invalid={validPhone ? "false" : "true"}
-                                        aria-describedby="lastnamenote"
+                                        aria-describedby="phonenote"
                                         onChange={(e) => setPhone(e.target.value)}
                                         onFocus={() => setPhoneFocus(true)}
                                         onBlur={() => setPhoneFocus(false)}
                                     /></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="2" id="phone" className={phoneFocus && phone && !validPhone ? "instructions" : "offscreen"}>
+                                    <td colspan="2" id="phonenote" className={phoneFocus && phone && !validPhone ? "instructions" : "offscreen"}>
                                         <CgDanger className='danger' />
                                         Veuillez saisir un numéro de téléphone valide
                                     </td>
@@ -634,8 +634,8 @@ const SignUp = (props) => {
                                                 onFocus={() => setSpecializationFocus(true)}
                                                 onBlur={() => setSpecializationFocus(false)}
                                             >
-                                                {specializationList.map((specialization, index) => (
-                                                    <option key={index} value={specialization}>
+                                                {specializationList.map((specialization) => (
+                                                    <option key={specialization} value={specialization}>
                                                         {specialization}
                                                     </option>
                                                 ))}

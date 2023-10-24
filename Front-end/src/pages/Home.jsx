@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import Swal from 'sweetalert2';
+import { Helmet } from 'react-helmet';
 
 //Components
 import Loader from '../components/Loader';
@@ -160,6 +161,10 @@ const Home = ({ user }) => {
     // }
     return (
         <div className='home'>
+            <Helmet>
+                <title>Page d'accueil</title>
+                <meta name="description" content="Bienvenue sur la page d'accueil" />
+            </Helmet>
             <HomeHeader onSearchResult={handleSearchResult} />
             {searchResult ?
                 (
