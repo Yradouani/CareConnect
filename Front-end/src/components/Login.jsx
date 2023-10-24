@@ -22,7 +22,7 @@ const Login = () => {
         emailRef.current.focus();
     }, [])
 
-    //Enlever le msg d'erreur si l'utilisateur entre des données
+    //Remove error message if user is writing
     useEffect(() => {
         setErrMsg('');
     }, [email, pwd])
@@ -36,7 +36,6 @@ const Login = () => {
                 JSON.stringify({ email, password: pwd }),
                 {
                     headers: { 'Content-Type': 'application/json' },
-                    // withCredentials: true
                 }
             );
 

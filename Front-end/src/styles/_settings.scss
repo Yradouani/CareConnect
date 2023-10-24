@@ -82,4 +82,23 @@ body {
         padding: 0.5rem;
         margin-bottom: 30px;
     }
+
+}
+
+.modal {
+    &-name {
+        font-size: 22px;
+    }
+
+    &-phone,
+    &-email,
+    &-delete,
+    &-text {
+        text-align: start;
+    }
+
+    &-delete {
+        color: red;
+        margin-top: 20px;
+    }
 }

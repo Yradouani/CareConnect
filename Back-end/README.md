@@ -23,6 +23,11 @@ Change database ids in .env file
 php artisan serve
 ```
 
+### Test
+```
+php artisan test
+```
+
 ### Compiles and minifies for production
 ```
 npm run build

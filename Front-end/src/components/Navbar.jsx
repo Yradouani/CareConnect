@@ -1,16 +1,13 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FaPowerOff } from "react-icons/fa";
 import { MdDateRange } from "react-icons/md";
-import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../actions/user.action';
 import { cleanAppointments } from '../actions/appointment.action';
 
 const Navbar = () => {
     const user = useSelector((state) => state.userReducer.user);
-    const [openModal, setOpenModal] = useState(false);
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
     useEffect(() => {
@@ -23,10 +20,6 @@ const Navbar = () => {
         dispatch(cleanAppointments());
         navigate('/');
     };
-
-    const openNavModal = async (e) => {
-        setOpenModal(true);
-    }
 
     return (
         <div className='navbar'>
@@ -56,7 +49,7 @@ const Navbar = () => {
                 </li>
                 <li>
                     <NavLink to="/rendez-vous" className={(nav) => (nav.isActive ? "nav-active" : "")}>
-                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" data-icon-name="solid/calendar-day" data-design-system-component="Icon"><path d="M6.5 2.75v.75h3v-.75c0-.398.328-.75.75-.75.398 0 .75.352.75.75v.75h1.125c.61 0 1.125.516 1.125 1.125V5.75H2.75V4.625c0-.61.492-1.125 1.125-1.125H5v-.75c0-.398.328-.75.75-.75.398 0 .75.352.75.75ZM2.75 6.5h10.5v6.375c0 .633-.516 1.125-1.125 1.125h-8.25a1.11 1.11 0 0 1-1.125-1.125V6.5ZM4.625 8a.385.385 0 0 0-.375.375v2.25c0 .21.164.375.375.375h2.25a.385.385 0 0 0 .375-.375v-2.25A.403.403 0 0 0 6.875 8h-2.25Z"></path></svg>
+                        <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M6.5 2.75v.75h3v-.75c0-.398.328-.75.75-.75.398 0 .75.352.75.75v.75h1.125c.61 0 1.125.516 1.125 1.125V5.75H2.75V4.625c0-.61.492-1.125 1.125-1.125H5v-.75c0-.398.328-.75.75-.75.398 0 .75.352.75.75ZM2.75 6.5h10.5v6.375c0 .633-.516 1.125-1.125 1.125h-8.25a1.11 1.11 0 0 1-1.125-1.125V6.5ZM4.625 8a.385.385 0 0 0-.375.375v2.25c0 .21.164.375.375.375h2.25a.385.385 0 0 0 .375-.375v-2.25A.403.403 0 0 0 6.875 8h-2.25Z"></path></svg>
                         <span>Rendez-vous</span>
                     </NavLink>
                 </li>

@@ -425,12 +425,21 @@ const Appointments = ({ user }) => {
     // }
     const handleEventClick = (event) => {
         const matchAppointment = appointments.find(appointment => appointment.id === event);
-
+        let texte = "";
+        if (matchAppointment.patient) {
+            texte = `<div class="modal-name">Avec ${matchAppointment.patient.user.firstname} ${matchAppointment.patient.user.lastname}</div> 
+            <br/>
+            <div class="modal-text">Contactez votre patient :</div>
+            <div class="modal-phone">Numéro de téléphone : ${matchAppointment.patient.user.phone}</div>
+            <div class="modal-email">Adresse email : ${matchAppointment.patient.user.email}</div>
+            <div class="modal-delete">Souhaitez-vous annuler ce rendez-vous ?</div>
+            `
+        }
         if (matchAppointment) {
 
             Swal.fire({
-                title: `Annuler le rendez-vous du ${formatDate(matchAppointment.dateOfAppointment)} à ${matchAppointment.timeOfAppointment}?`,
-                text: 'Voulez-vous vraiment annuler ce rendez-vous ?',
+                title: `Rendez-vous du ${formatDate(matchAppointment.dateOfAppointment)} à ${matchAppointment.timeOfAppointment}?`,
+                html: texte,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Oui, annuler',
