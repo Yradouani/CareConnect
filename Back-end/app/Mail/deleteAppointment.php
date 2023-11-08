@@ -3,11 +3,10 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class confirmAppointment extends Mailable
+class deleteAppointment extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -32,8 +31,8 @@ class confirmAppointment extends Mailable
      */
     public function build()
     {
-        return $this->subject('Confirmation de réservation de rendez-vous')
-            ->view('emails.confirm-appointment')
+        return $this->subject('Annulation de rendez-vous')
+            ->view('emails.remove-appointment')
             ->with(['appointment' => $this->appointment, 'user' => $this->user]);
     }
 }

@@ -326,7 +326,7 @@ const Appointments = ({ user }) => {
             if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Créneau supprimer avec succès',
+                    title: 'Rendez-vous supprimer avec succès',
                     showConfirmButton: false,
                     timer: 1500
                 });
@@ -430,11 +430,13 @@ const Appointments = ({ user }) => {
         if (matchAppointment.patient) {
             texte = `<div class="modal-name">Avec ${matchAppointment.patient.user.firstname} ${matchAppointment.patient.user.lastname}</div> 
             <br/>
-            <div class="modal-text">Contactez votre patient :</div>
+            <div class="modal-text">Contactez votre patient </div>
             <div class="modal-phone">Numéro de téléphone : ${matchAppointment.patient.user.phone}</div>
             <div class="modal-email">Adresse email : ${matchAppointment.patient.user.email}</div>
             <div class="modal-delete">Souhaitez-vous annuler ce rendez-vous ?</div>
             `
+        } else {
+            texte = "Souhaitez-vous supprimer ce créneau ?"
         }
         if (matchAppointment) {
 

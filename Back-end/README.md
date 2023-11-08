@@ -28,6 +28,13 @@ php artisan serve
 php artisan test
 ```
 
+### MailHog
+```
+MailHog
+```
+Then go to http://localhost:8025/ (change port if necessary)
+Change also port in .env
+
 ### Compiles and minifies for production
 ```
 npm run build

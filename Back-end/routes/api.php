@@ -11,7 +11,6 @@ Route::middleware(['throttle:login'])->group(function () {
 
 Route::post('/inscription', [UserController::class, "registration"]);
 Route::post('/mon-compte', [UserController::class, "getUserById"]);
-Route::post('/recherche', [UserController::class, "getDoctorByNameSpecialityAndLocation"]);
 
 //Routes protected by token authentication
 Route::middleware(['jwt.auth'])->group(function () {
@@ -22,5 +21,6 @@ Route::middleware(['jwt.auth'])->group(function () {
     Route::put('/rendez-vous/{id}', [AppointmentController::class, "makeAppointment"]);
 
     //Users
+    Route::post('/recherche', [UserController::class, "getDoctorByNameSpecialityAndLocation"]);
     Route::put('/profile/{id}', [UserController::class, "updateProfil"]);
 });

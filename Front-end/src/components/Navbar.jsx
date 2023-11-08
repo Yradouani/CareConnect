@@ -60,6 +60,9 @@ const Navbar = () => {
                     </NavLink>
                 </li>
             </ul>
+            <NavLink onClick={() => deconnection()} className="navbar__mobile-deconnection">
+                <li><FaPowerOff /></li>
+            </NavLink>
         </div >
     );
 };

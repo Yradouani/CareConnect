@@ -26,6 +26,14 @@ class Appointment extends Model
     {
         return $this->belongsTo(Patient::class, 'patient_id', 'user_id');
     }
+    public function user_doctor()
+    {
+        return $this->belongsTo(User::class, 'doctor_id');
+    }
+    public function user_patient()
+    {
+        return $this->belongsTo(User::class, 'patient_id');
+    }
 }
 
 // INSERT INTO appointments (dateOfAppointment, timeOfAppointment, doctor_id, available)

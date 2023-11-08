@@ -124,6 +124,14 @@
                 flex-direction: column;
                 border-radius: 10px;
 
+                @media (max-width: 900px) {
+                    width: 70%;
+                }
+
+                @media (max-width: 550px) {
+                    width: 90%;
+                }
+
                 svg {
                     cursor: pointer;
                 }
@@ -183,7 +191,7 @@
                 align-items: center;
                 cursor: pointer;
 
-                svg{
+                svg {
                     margin-right: 5px;
                 }
             }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -12,7 +12,6 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 const Profile = ({ user }) => {
-    // const user = useSelector((state) => state.userReducer.user);
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
@@ -71,7 +70,6 @@ const Profile = ({ user }) => {
             preConfirm: () => {
                 const areInputsValid = validateInputs();
                 if (!areInputsValid) {
-                    console.log(REGEX)
                     Swal.showValidationMessage(`${string1} incorrect, veuillez entrer un champs valide`);
                 }
                 return areInputsValid;

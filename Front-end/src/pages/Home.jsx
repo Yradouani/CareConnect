@@ -23,6 +23,7 @@ const Home = ({ user }) => {
     const [appointmentOfSelectedDoctor, setAppointmentOfSelectedDoctor] = useState(null);
     const [appointmentDay, setAppointmentDay] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [inputValue, setInputValue] = useState("");
 
 
     const handleSearchResult = (result) => {
@@ -129,6 +130,7 @@ const Home = ({ user }) => {
             }
             setTakeAppointment(false);
             setSearchResult(false);
+            setInputValue("");
         } catch (err) {
             if (err.response.status === 400) {
                 Swal.fire({
@@ -165,7 +167,7 @@ const Home = ({ user }) => {
                 <title>Page d'accueil</title>
                 <meta name="description" content="Bienvenue sur la page d'accueil" />
             </Helmet>
-            <HomeHeader onSearchResult={handleSearchResult} />
+            <HomeHeader onSearchResult={handleSearchResult} value={inputValue}/>
             {searchResult ?
                 (
                     takeAppointment && !loading ? (

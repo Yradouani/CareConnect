@@ -244,6 +244,9 @@ const SignUp = (props) => {
                     setErrMsg('Pas de réponse du serveur');
                 } else if (err.response?.status === 409) {
                     setErrMsg("Inscription échouée");
+                } else if (err.response?.status === 422) {
+                    setErrMsg("Vous avez déjà un compte avec cet email");
+                    setValidEmail(false);
                 }
                 errRef.current.focus();
             }
@@ -525,7 +528,7 @@ const SignUp = (props) => {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="2" id="rolenote" className={emailFocus && email && !validEmail ? "instructions" : "offscreen"}>
+                                    <td colspan="2" id="rolenote" className={role && !validRole ? "instructions" : "offscreen"}>
                                         <CgDanger className='danger' />
                                         Veuillez choisir une des 2 options
                                     </td>

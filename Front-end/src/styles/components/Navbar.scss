@@ -210,5 +210,19 @@
                 }
             }
         }
+
+        &-deconnection {
+            color: white;
+            margin-right: 30px;
+
+            @media (min-width: 780px) {
+                display: none;
+            }
+
+            svg {
+                width: 30px;
+                height: 20px;
+            }
+        }
     }
 }

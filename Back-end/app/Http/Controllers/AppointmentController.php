@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Mail\confirmAppointment;
+use App\Mail\deleteAppointment;
 use App\Models\Appointment;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class AppointmentController extends Controller
@@ -19,7 +21,7 @@ class AppointmentController extends Controller
                 "timeOfAppointment" => ["required", "date_format:H:i"],
                 "endTimeOfAppointment" => ["required", "date_format:H:i"],
                 "doctor_id" => ["required", "integer"],
-                "role" => ["required", "string", "in:patient,doctor"]
+                "role" => ["required", "string", "in:doctor"]
             ]);
 
             // check if there is already an appointment
@@ -83,6 +85,7 @@ class AppointmentController extends Controller
     public function deleteAppointment($id, Request $request)
     {
         $appointment = Appointment::find($id);
+        $user = $appointment->user_patient;
 
         if (!$appointment) {
             return response()->json(['error' => 'Rendez-vous introuvable.'], 404);
@@ -91,6 +94,13 @@ class AppointmentController extends Controller
         if ($request->role === "doctor") {
             try {
                 $appointment->delete();
+                if ($user) {
+                    try {
+                        Mail::to($user->email)->send(new deleteAppointment($appointment, $user));
+                    } catch (Exception $e) {
+                        return $e;
+                    }
+                }
                 return response()->json(['message' => 'Rendez-vous supprimé avec succès.'], 200);
             } catch (Exception $e) {
                 return response()->json(['error' => 'Erreur lors de la suppression du rendez-vous.'], 500);
@@ -122,7 +132,11 @@ class AppointmentController extends Controller
             if (is_null($appointment->patient_id)) {
                 $appointment->patient_id = $request->input('patient_id');
                 $appointment->save();
-                Mail::to($user->email)->send(new confirmAppointment($appointment));
+                try {
+                    Mail::to($user->email)->send(new confirmAppointment($appointment, $user));
+                } catch (Exception $e) {
+                    return $e;
+                }
                 return response()->json(['message' => 'Rendez-vous réservé avec succès.'], 200);
             } else {
                 return response()->json(['error' => 'Le rendez-vous est déjà pris par un autre patient'], 400);

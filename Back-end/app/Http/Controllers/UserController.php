@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\JWT as JWTAuthJWT;
 
 class UserController extends Controller
 {
@@ -23,10 +22,14 @@ class UserController extends Controller
                 "lastname" => ["required", "string", "min:2", "max:30"],
                 "phone" => ["required", "string", "min:10", "max:13"],
                 "role" => ["required", "string", "in:patient,doctor"],
-                "email" => ["required", "email", "unique:users,email"],
+                "email" => ["required", "email"],
                 "password" => ["required", "string", "min:8", "max:30"],
                 "confirm_password" => ["required", "same:password"]
             ]);
+
+            if (User::where('email', $userInfo['email'])->exists()) {
+                return response()->json(['error' => 'Email already exists'], 422);
+            }
 
             $user = User::create([
                 "firstname" => $userInfo["firstname"],
@@ -81,8 +84,8 @@ class UserController extends Controller
         ]);
 
         $user = User::where("email", $userInfo["email"])->first();
-        if (!$user) return response(["message" => "Aucun utilisateur de trouver avec l'email suivant $userInfo[email]"], 401);
-        if (!Hash::check($userInfo["password"], $user->password)) return response(["message" => "Aucun utilisateur de trouver avec ce mot de passe"], 401);
+        if (!$user) return response(["message" => "No user find with this email : $userInfo[email]"], 401);
+        if (!Hash::check($userInfo["password"], $user->password)) return response(["message" => "No user find with this password"], 401);
 
         $customClaims = [
             'id' => $user->id,
@@ -133,7 +136,7 @@ class UserController extends Controller
             $user = User::find($id);
 
             if (!$user) {
-                return response()->json(['error' => 'Utilisateur introuvable.'], 404);
+                return response()->json(['error' => 'User not found'], 404);
             }
 
             $key = $request->input('property');
@@ -142,19 +145,23 @@ class UserController extends Controller
             if ($key && $user->isFillable($key)) {
                 $user->$key = $value;
                 $user->save();
-                return response()->json(['message' => 'Profile modifié avec succès.'], 200);
+                return response()->json(['message' => 'Success updated profil'], 200);
             } else {
-                return response()->json(['error' => 'Clé invalide ou non autorisée.'], 400);
+                return response()->json(['error' => 'Invalid key'], 400);
             }
         } catch (Exception $e) {
-            return response()->json(['error' => 'Erreur lors de la modification du profile'], 500);
+            return response()->json(['error' => 'Update profil error'], 500);
         }
     }
 
     public function getDoctorByNameSpecialityAndLocation(Request $request)
     {
-        $searchinput = $request->input('searchinput');
-        $searchlocation = $request->input('location');
+        $search = $request->validate([
+            'searchinput' => 'nullable|string|max:255',
+            'location' => 'nullable|string|max:255',
+        ]);
+        $searchinput = $search['searchinput'];
+        $searchlocation = $search['location'];
         $doctors = Doctor::query();
 
         if ($searchinput) {

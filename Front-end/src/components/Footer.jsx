@@ -25,7 +25,7 @@ const Footer = () => {
                 <div className='footer__info-plan'>
                     <h2>Plan du site</h2>
                     <a href="/">Accueil</a>
-                    <a href="/rendez-vous">Prendre un rendez-vous</a>
+                    <a href="/rendez-vous">Consulter mes rendez-vous</a>
                     <a href="/compte">Information de mon compte</a>
                 </div>
             </div>

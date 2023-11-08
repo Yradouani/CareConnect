@@ -1,9 +1,11 @@
 import React from 'react';
 import { useRef, useState, useEffect } from 'react';
 import Navbar from '../Navbar';
+import { useSelector } from 'react-redux';
 import axios from '../../api/axios';
 
-const HomeHeader = ({ onSearchResult }) => {
+const HomeHeader = ({ onSearchResult, value }) => {
+    const user = useSelector((state) => state.userReducer.user);
     const searchinputRef = useRef();
     const locationRef = useRef();
 
@@ -19,7 +21,10 @@ const HomeHeader = ({ onSearchResult }) => {
                 "/recherche",
                 JSON.stringify({ searchinput, location }),
                 {
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${user.token}`
+                    }
                 }
             );
             setSearchResult(response.data)
