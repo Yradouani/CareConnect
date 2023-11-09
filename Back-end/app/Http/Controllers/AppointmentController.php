@@ -8,8 +8,8 @@ use App\Models\Appointment;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class AppointmentController extends Controller
 {
@@ -17,12 +17,25 @@ class AppointmentController extends Controller
     {
         try {
             $appointmentInfo = $request->validate([
-                "dateOfAppointment" => ["required", "date"],
+                "dateOfAppointment" => ["required", "date", "date_format:Y-m-d"],
                 "timeOfAppointment" => ["required", "date_format:H:i"],
                 "endTimeOfAppointment" => ["required", "date_format:H:i"],
                 "doctor_id" => ["required", "integer"],
                 "role" => ["required", "string", "in:doctor"]
             ]);
+
+            $validator = Validator::make($request->all(), [
+                "dateOfAppointment" => ["required", "date", "date_format:Y-m-d"],
+                "timeOfAppointment" => ["required", "date_format:H:i"],
+                "endTimeOfAppointment" => ["required", "date_format:H:i"],
+                "doctor_id" => ["required", "integer"],
+                "role" => ["required", "string", "in:doctor"]
+            ]);
+
+            // Vérifiez si la validation a échoué
+            if ($validator->fails()) {
+                return response()->json(['error' => 'Validation fails'], 400);
+            }
 
             // check if there is already an appointment
             if ($appointmentInfo["role"] === "doctor") {
@@ -54,7 +67,7 @@ class AppointmentController extends Controller
                 $appointment->save();
                 return response()->json($appointment, 200);
             } else {
-                return response()->json(['error' => 'Vous n\'avez pas les droits pour créer un rendez-vous'], 404);
+                return response()->json(['error' => 'You don\'t have rights to create appointment'], 404);
             }
         } catch (Exception $e) {
             echo '</br> <b> Exception Message: ' . $e->getMessage() . '</b>';
@@ -78,7 +91,7 @@ class AppointmentController extends Controller
                 echo '</br> <b> Exception Message: ' . $e->getMessage() . '</b>';
             }
         } else {
-            return response()->json(['message' => 'Utilisateur introuvable.'], 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
     }
 
@@ -88,7 +101,7 @@ class AppointmentController extends Controller
         $user = $appointment->user_patient;
 
         if (!$appointment) {
-            return response()->json(['error' => 'Rendez-vous introuvable.'], 404);
+            return response()->json(['error' => 'Appointment not found'], 404);
         }
 
         if ($request->role === "doctor") {
@@ -101,17 +114,17 @@ class AppointmentController extends Controller
                         return $e;
                     }
                 }
-                return response()->json(['message' => 'Rendez-vous supprimé avec succès.'], 200);
+                return response()->json(['message' => 'Appointment delete successfully'], 200);
             } catch (Exception $e) {
-                return response()->json(['error' => 'Erreur lors de la suppression du rendez-vous.'], 500);
+                return response()->json(['error' => 'Error, impossible to delete appointment'], 500);
             }
         } else if ($request->role === "patient") {
             try {
                 $appointment->patient_id = null;
                 $appointment->save();
-                return response()->json(['message' => 'Rendez-vous supprimé avec succès.'], 200);
+                return response()->json(['message' => 'Appointment delete successfully'], 200);
             } catch (Exception $e) {
-                return response()->json(['error' => 'Erreur lors de la suppression du rendez-vous.'], 500);
+                return response()->json(['error' => 'Error, impossible to delete appointment'], 500);
             }
         }
     }
@@ -122,11 +135,11 @@ class AppointmentController extends Controller
             $appointment = Appointment::find($id);
             $user = User::find($request->patient_id);
             if (!$appointment) {
-                return response()->json(['error' => 'Rendez-vous introuvable.'], 404);
+                return response()->json(['error' => 'Appointment not found'], 404);
             }
 
             if ($request->role === "doctor") {
-                return response()->json(['error' => 'Vous ne pouvez pas prendre rendez-vous avec un compte professionnel'], 401);
+                return response()->json(['error' => 'You can\'t book appointment with profesionnal account'], 401);
             }
 
             if (is_null($appointment->patient_id)) {
@@ -137,12 +150,12 @@ class AppointmentController extends Controller
                 } catch (Exception $e) {
                     return $e;
                 }
-                return response()->json(['message' => 'Rendez-vous réservé avec succès.'], 200);
+                return response()->json(['message' => 'Appointment booked successfully.'], 200);
             } else {
-                return response()->json(['error' => 'Le rendez-vous est déjà pris par un autre patient'], 400);
+                return response()->json(['error' => 'The appointment is already made by another patient'], 400);
             }
         } catch (Exception $e) {
-            return response()->json(['error' => 'Erreur lors de la prise de rendez-vous.'], 500);
+            return response()->json(['error' => 'Error making appointment.'], 500);
         }
     }
 }

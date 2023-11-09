@@ -35,6 +35,11 @@ MailHog
 Then go to http://localhost:8025/ (change port if necessary)
 Change also port in .env
 
+```
+php artisan schedule:work
+```
+To check if scheduled commands are ready to run
+
 ### Compiles and minifies for production
 ```
 npm run build
