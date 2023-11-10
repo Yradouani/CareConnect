@@ -16,6 +16,7 @@ class AppointmentControllerTest extends TestCase
      *
      * @return void
      */
+
     public function test_it_can_create_an_appointment()
     {
         $user = User::factory()->create();
@@ -59,6 +60,24 @@ class AppointmentControllerTest extends TestCase
         $response->assertStatus(400);
     }
 
+    public function test_it_can_not_create_appointment_with_bad_role()
+    {
+        $user = User::factory()->create();
+        $token = JWTAuth::fromUser($user);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->json('POST', '/api/ajouter-un-rendez-vous', [
+            'dateOfAppointment' => '2023-10-20',
+            'timeOfAppointment' => '18:30',
+            'endTimeOfAppointment' => '19:00',
+            'doctor_id' => 3,
+            'role' => 'patient',
+        ]);
+
+        $response->assertStatus(404);
+    }
+
     public function test_it_can_not_create_appointment_with_bad_date()
     {
         $user = User::factory()->create();
@@ -67,13 +86,30 @@ class AppointmentControllerTest extends TestCase
         $response = $this->withHeaders([
             'Authorization' => 'Bearer ' . $token,
         ])->json('POST', '/api/ajouter-un-rendez-vous', [
-            'dateOfAppointment' => '2023/10/20',
+            'dateOfAppointment' => '2023-25-20',
             'timeOfAppointment' => '18:30',
             'endTimeOfAppointment' => '19:00',
             'doctor_id' => 3,
             'role' => 'doctor',
         ]);
 
-        $response->assertStatus(400);
+        $response->assertStatus(500);
+    }
+
+    public function test_it_can_not_create_appointment_with_bad_time()
+    {
+        $user = User::factory()->create();
+        $token = JWTAuth::fromUser($user);
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+        ])->json('POST', '/api/ajouter-un-rendez-vous', [
+            'dateOfAppointment' => '2023-25-20',
+            'timeOfAppointment' => '20:30',
+            'endTimeOfAppointment' => '19:00',
+            'doctor_id' => 3,
+            'role' => 'doctor',
+        ]);
+
+        $response->assertStatus(500);
     }
 }

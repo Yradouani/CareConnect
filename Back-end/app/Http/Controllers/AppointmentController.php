@@ -15,27 +15,22 @@ class AppointmentController extends Controller
 {
     public function addAppointment(Request $request)
     {
+        // dd($request->all());
         try {
             $appointmentInfo = $request->validate([
                 "dateOfAppointment" => ["required", "date", "date_format:Y-m-d"],
                 "timeOfAppointment" => ["required", "date_format:H:i"],
-                "endTimeOfAppointment" => ["required", "date_format:H:i"],
-                "doctor_id" => ["required", "integer"],
-                "role" => ["required", "string", "in:doctor"]
-            ]);
+                "endTimeOfAppointment" => ["required", "date_format:H:i", function ($attribute, $value, $fail) use ($request) {
+                    $startTime = strtotime($request->input('timeOfAppointment'));
+                    $endTime = strtotime($value);
 
-            $validator = Validator::make($request->all(), [
-                "dateOfAppointment" => ["required", "date", "date_format:Y-m-d"],
-                "timeOfAppointment" => ["required", "date_format:H:i"],
-                "endTimeOfAppointment" => ["required", "date_format:H:i"],
+                    if ($startTime >= $endTime) {
+                        $fail("endTimeOfAppointment needs to be after timeOfAppointment");
+                    }
+                },],
                 "doctor_id" => ["required", "integer"],
-                "role" => ["required", "string", "in:doctor"]
+                "role" => ["required", "string"]
             ]);
-
-            // Vérifiez si la validation a échoué
-            if ($validator->fails()) {
-                return response()->json(['error' => 'Validation fails'], 400);
-            }
 
             // check if there is already an appointment
             if ($appointmentInfo["role"] === "doctor") {
@@ -70,7 +65,7 @@ class AppointmentController extends Controller
                 return response()->json(['error' => 'You don\'t have rights to create appointment'], 404);
             }
         } catch (Exception $e) {
-            echo '</br> <b> Exception Message: ' . $e->getMessage() . '</b>';
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
