@@ -104,7 +104,7 @@ const Profile = ({ user }) => {
             if (response.status === 200) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Profile modifier avec succès',
+                    title: 'Profil modifié avec succès',
                     showConfirmButton: false,
                     timer: 1500
                 });
@@ -121,7 +121,7 @@ const Profile = ({ user }) => {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Erreur lors de la modification du profile',
+                    title: 'Erreur lors de la modification du profil',
                     text: 'Veuillez réessayer.',
                 });
             }

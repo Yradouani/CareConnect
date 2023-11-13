@@ -42,7 +42,7 @@ const HomeHeader = ({ onSearchResult, value }) => {
     return (
         <header className='header'>
             <Navbar />
-            <img src="background.png" alt="background" className='header__background' />
+            <img src="background.png" alt="fond d'écran de la page d'accueil" className='header__background' />
             <h1>Prenez rendez-vous avec un professionel de santé</h1>
             <div className='header__searchbar'>
                 <form onSubmit={e => handleSearch(e)}>

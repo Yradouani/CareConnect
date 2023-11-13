@@ -1,10 +1,11 @@
 import React from 'react';
-import axios from '../api/axios';
 import { useState, useEffect } from 'react';
+import { addAppointment, deleteAppointmentInStore, setAppointments } from '../actions/appointment.action';
+
+//Package
+import axios from '../api/axios';
 import { useSelector, useDispatch } from 'react-redux';
 import { Helmet } from 'react-helmet';
-import Loader from '../components/Loader';
-import { addAppointment, deleteAppointmentInStore, setAppointments } from '../actions/appointment.action';
 import Swal from 'sweetalert2';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
@@ -12,6 +13,7 @@ import moment from 'moment';
 import 'moment/locale/fr';
 
 //Components
+import Loader from '../components/Loader';
 import Footer from '../components/Footer';
 import Navbar from '../components/Navbar';
 import CardAppointment from '../components/CardAppointment';
@@ -118,6 +120,7 @@ const Appointments = ({ user }) => {
     const userId = user?.id;
     const uniqueDays = [];
     const [isLoading, setIsLoading] = useState(true);
+    const [shouldReload, setShouldReload] = useState(false);
     const [dateAppointment, setDateAppointment] = useState("today");
     const [modal, setOpenModal] = useState(false);
     const [pastAppointments, setPastAppointments] = useState('');
@@ -332,6 +335,12 @@ const Appointments = ({ user }) => {
                 });
             }
             dispatch(deleteAppointmentInStore(id))
+
+
+            //Temporary solution
+            if (appointments.length === 1) {
+                window.location.reload();
+            }
         } catch (err) {
             console.log(err);
 

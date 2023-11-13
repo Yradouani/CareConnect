@@ -24,7 +24,7 @@ const Navbar = () => {
     return (
         <div className='navbar'>
             <NavLink to="/accueil">
-                <img src="../../logo.png" alt="logo" className='logo' />
+                <img src="../../logo.png" alt="logo de l'entreprise" className='logo' />
             </NavLink>
             <ul className='navbar__desktop'>
                 <NavLink to="/profil" className={(nav) => (nav.isActive ? "nav-active" : "")}>

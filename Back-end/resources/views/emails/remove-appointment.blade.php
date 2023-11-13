@@ -13,7 +13,7 @@ use Carbon\Carbon;
 
 <body>
     <div class="confirm-mail">
-        <div class="confirm-mail__date">Nous avons le regrès de vous informer que votre {{ $appointment->doctor->specialization }} {{ $appointment->user_doctor->firstname }} {{ $appointment->user_doctor->lastname }} vient d'annuler votre rendez-vous du {{ Carbon::parse($appointment->dateOfAppointment)->format('d/m/Y') }} à {{ Carbon::parse($appointment->timeOfAppointment)->format('H\hi') }}</div>
+        <div class="confirm-mail__date">Nous avons le regret de vous informer que votre {{ $appointment->doctor->specialization }} {{ $appointment->user_doctor->firstname }} {{ $appointment->user_doctor->lastname }} vient d'annuler votre rendez-vous du {{ Carbon::parse($appointment->dateOfAppointment)->format('d/m/Y') }} à {{ Carbon::parse($appointment->timeOfAppointment)->format('H\hi') }}</div>
 
         <button>
             <a href="http://127.0.0.1:3000">
