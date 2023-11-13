@@ -5,12 +5,7 @@ Clone git repository.
 ```
 git clone https://github.com/Yradouani/CareConnect.git
 ```
-### Dependencies setup
-Update package.json dependencies to latest.
-```
-npx npm-check-updates -u
-```
-Install dependencies.
+### Install dependencies
 ```
 npm install
 ```
