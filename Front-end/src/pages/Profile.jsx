@@ -21,8 +21,7 @@ const Profile = ({ user }) => {
         }
     }, [user, navigate]);
 
-    const changeProfil = async (propertyTochange, string1) => {
-
+    const changeProfil = async (propertyTochange, value) => {
         let REGEX;
         switch (propertyTochange) {
             case 'text':
@@ -42,12 +41,12 @@ const Profile = ({ user }) => {
         }
 
         let html = `
-                    <label for="${propertyTochange}">${string1} :</label>
+                    <label for="${propertyTochange}">${value} :</label>
                     <input 
                     type="${propertyTochange}" 
                     id="${propertyTochange}" 
                     class="swal2-input" 
-                    placeholder="${string1}"
+                    placeholder="${value}"
                     required
                     autoComplete='off'
                     aria-invalid={validString1 ? "false" : "true"}
@@ -62,7 +61,7 @@ const Profile = ({ user }) => {
             return false;
         };
         Swal.fire({
-            title: `Souhaitez-vous modifier votre ${string1} ?`,
+            title: `Souhaitez-vous modifier votre ${value} ?`,
             html: html,
             showCancelButton: true,
             confirmButtonText: 'Modifier',
@@ -70,19 +69,18 @@ const Profile = ({ user }) => {
             preConfirm: () => {
                 const areInputsValid = validateInputs();
                 if (!areInputsValid) {
-                    Swal.showValidationMessage(`${string1} incorrect, veuillez entrer un champs valide`);
+                    Swal.showValidationMessage(`${value} incorrect, veuillez entrer un champs valide`);
                 }
                 return areInputsValid;
             },
         }).then((result) => {
             if (result.isConfirmed) {
                 const newValue1 = document.getElementById(propertyTochange).value;
-
                 confirmChangeProfil(newValue1, propertyTochange);
             }
         });
     }
-    const confirmChangeProfil = async (newValue1, propertyTochange) => {
+    const confirmChangeProfil = async (newValue, propertyTochange) => {
         if (propertyTochange === 'text') {
             propertyTochange = 'lastname';
         }
@@ -92,7 +90,7 @@ const Profile = ({ user }) => {
                 `/profile/${user.id}`,
                 JSON.stringify({
                     property: propertyTochange,
-                    value: newValue1
+                    value: newValue
                 }),
                 {
                     headers: {
@@ -109,7 +107,7 @@ const Profile = ({ user }) => {
                     timer: 1500
                 });
 
-                dispatch(updateUserProperty(propertyTochange, newValue1));
+                dispatch(updateUserProperty(propertyTochange, newValue));
             }
         } catch (err) {
             if (err.response.status === 400) {

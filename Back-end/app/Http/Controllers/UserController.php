@@ -98,8 +98,11 @@ class UserController extends Controller
         ];
         $token = JWTAuth::claims($customClaims)->fromUser($user);
 
+        $csrfToken = csrf_token();
+
         return response([
-            "token" => $token
+            "token" => $token,
+            "csrf_token" => $csrfToken
         ], 200);
     }
 

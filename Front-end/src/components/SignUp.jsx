@@ -242,8 +242,6 @@ const SignUp = (props) => {
                 console.log(err);
                 if (!err?.response) {
                     setErrMsg('Pas de réponse du serveur');
-                } else if (err.response?.status === 409) {
-                    setErrMsg("Inscription échouée");
                 } else if (err.response?.status === 422) {
                     setErrMsg("Vous avez déjà un compte avec cet email");
                     setValidEmail(false);

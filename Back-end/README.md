@@ -25,7 +25,7 @@ php artisan test
 
 ### MailHog
 ```
-MailHog
+mailhog or run the exe
 ```
 Then go to http://localhost:8025/ (change port if necessary)
 Change also port in .env
